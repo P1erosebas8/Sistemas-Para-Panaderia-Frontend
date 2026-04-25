@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+@theme {
+  /* Definimos tu paleta de colores según la imagen */
+  --color-artisan-primary: #8B572A;
+  --color-artisan-secondary: #E67E22;
+  --color-artisan-tertiary: #D4A373;
+  --color-artisan-neutral: #FDFBF7;
+  --color-artisan-dark: #333333;
+
+  /* Configuramos la fuente Inter */
+  --font-inter: "Inter", ui-sans-serif, system-ui;
+}

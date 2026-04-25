@@ -22,7 +22,7 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<AboutSection />} />
-          
+          <Route path="ubicanos" element={<LocationPage />} /> {/* Añade esta ruta */}
           {/* Ejemplo de rutas futuras que podrías añadir:
           <Route path="pastries" element={<PastriesPage />} />
           <Route path="contact" element={<ContactPage />} /> 
