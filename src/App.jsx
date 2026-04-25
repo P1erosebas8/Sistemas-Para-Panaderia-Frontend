@@ -1,20 +1,35 @@
-import Navbar from "./components/layout/Navbar";
+// src/App.jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import MainLayout from './components/layout/MainLayout';
 import Hero from "./components/ui/Hero";
 import ProductGrid from "./components/ui/ProductGrid";
 import Subscription from "./components/ui/Subscription";
-import Footer from "./components/layout/Footer";
-import AboutSection from "./pages/public/About"
+import AboutSection from "./pages/public/About";
+
+const Home = () => (
+  <>
+    <Hero />
+    <ProductGrid />
+    <Subscription />
+  </>
+);
 
 function App() {
   return (
-    <>
-      <Navbar />
-      <Hero />
-      <ProductGrid />
-      <Subscription />
-      <AboutSection />
-      <Footer />
-    </>
+    <BrowserRouter>
+      <Routes>
+        {/* MainLayout envolverá a todas las rutas internas */}
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<Home />} />
+          <Route path="about" element={<AboutSection />} />
+          
+          {/* Ejemplo de rutas futuras que podrías añadir:
+          <Route path="pastries" element={<PastriesPage />} />
+          <Route path="contact" element={<ContactPage />} /> 
+          */}
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
