@@ -5,6 +5,7 @@ import Hero from "./components/ui/Hero";
 import ProductGrid from "./components/ui/ProductGrid";
 import Subscription from "./components/ui/Subscription";
 import AboutSection from "./pages/public/About";
+import LocationPage from "./pages/public/Location"
 
 const Home = () => (
   <>
@@ -22,7 +23,7 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
           <Route path="about" element={<AboutSection />} />
-          <Route path="ubicanos" element={<LocationPage />} /> {/* Añade esta ruta */}
+          <Route path="ubicanos" element={<LocationPage />} />
           {/* Ejemplo de rutas futuras que podrías añadir:
           <Route path="pastries" element={<PastriesPage />} />
           <Route path="contact" element={<ContactPage />} /> 
