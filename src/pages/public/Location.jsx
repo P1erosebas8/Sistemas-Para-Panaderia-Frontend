@@ -68,7 +68,7 @@ export default function LocationPage() {
     <div className="min-h-screen pt-24 pb-12 bg-artisan-neutral font-inter">
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12">
 
-        {/* Lista de Sedes (Igual que antes) */}
+        {/* Lista de Sedes */}
         <div className="md:col-span-1 space-y-4">
           <h1 className="text-3xl font-extrabold text-artisan-primary mb-6">Nuestras Sedes</h1>
           <div className="space-y-3 overflow-y-auto max-h-[600px] pr-2">
@@ -101,9 +101,10 @@ export default function LocationPage() {
           <div className="bg-white p-6 rounded-xl shadow-sm border border-artisan-tertiary/20">
             <h2 className="text-xl font-bold text-artisan-primary">Sede: {selectedStore.name}</h2>
             <p className="text-artisan-dark">{selectedStore.address}</p>
+            <p className="text-x font-bold text-artisan-primary">📞 (01) 7506881</p>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   );

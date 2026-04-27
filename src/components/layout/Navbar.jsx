@@ -10,7 +10,7 @@ export default function Navbar() {
       <div className="flex items-center justify-between px-6 py-4 mx-auto">
 
         <Link to="/" className="text-2xl font-bold">
-          Panaderia Ñefas
+          Panaderia Fina Briselli
         </Link>
 
         <div className="hidden md:flex space-x-8">
@@ -46,7 +46,7 @@ export default function Navbar() {
             to="/ubicanos" 
             className={({ isActive }) => isActive ? activeStyles : linkStyles}
           >
-            Ubicanos
+            Visítanos
           </NavLink>
         </div>
 
