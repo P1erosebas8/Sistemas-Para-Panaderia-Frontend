@@ -7,7 +7,7 @@ import AdminInventory from './pages/admin/Inventory';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminOrders from './pages/admin/Orders';
 import AdminUsers from './pages/admin/Users';
-import Login from './pages/public/Login';
+import Login from './pages/public/LoginAdmin';
 import AdminStores from './pages/admin/Stores';
 import Home from "./pages/public/Home";
 
