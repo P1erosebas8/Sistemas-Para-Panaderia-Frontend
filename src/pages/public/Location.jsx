@@ -63,8 +63,8 @@ export default function LocationPage() {
                 className={`p-4 rounded-xl cursor-pointer border-2 transition-all ${selectedStore?.id === store.id ? "border-[#8B572A] bg-white shadow-md" : "border-transparent bg-white/50"
                   }`}
               >
-                <h3 className="font-bold text-[#8B572A] text-sm">{store.name}</h3>
-                <p className="text-xs text-gray-500">{store.address}</p>
+                <h3 className="font-bold text-artisan-primary">{store.name}</h3>
+                <p className="text-sm text-artisan-dark/70">{store.address}</p>
               </div>
             ))}
           </div>
