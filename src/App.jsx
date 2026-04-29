@@ -6,14 +6,7 @@ import ProductGrid from "./components/ui/ProductGrid";
 import Subscription from "./components/ui/Subscription";
 import AboutSection from "./pages/public/About";
 import LocationPage from "./pages/public/Location"
-
-const Home = () => (
-  <>
-    <Hero />
-    <ProductGrid />
-    <Subscription />
-  </>
-);
+import Home from "./pages/public/Home"
 
 function App() {
   return (
