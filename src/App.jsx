@@ -1,27 +1,41 @@
-// src/App.jsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout';
-import Hero from "./components/ui/Hero";
-import ProductGrid from "./components/ui/ProductGrid";
-import Subscription from "./components/ui/Subscription";
 import AboutSection from "./pages/public/About";
-import LocationPage from "./pages/public/Location"
-import Home from "./pages/public/Home"
+import LocationPage from "./pages/public/Location";
+import AdminLayout from "./components/layout/AdminLayout";
+import AdminInventory from './pages/admin/Inventory';
+import AdminDashboard from './pages/admin/Dashboard';
+import AdminOrders from './pages/admin/Orders';
+import AdminUsers from './pages/admin/Users';
+import Login from './pages/public/Login';
+import AdminStores from './pages/admin/Stores';
+import Home from "./pages/public/Home";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* MainLayout envolverá a todas las rutas internas */}
+        
+        <Route path="login" element={<Login />}></Route>
+
         <Route path="/" element={<MainLayout />}>
+
           <Route index element={<Home />} />
           <Route path="about" element={<AboutSection />} />
           <Route path="ubicanos" element={<LocationPage />} />
-          {/* Ejemplo de rutas futuras que podrías añadir:
-          <Route path="pastries" element={<PastriesPage />} />
-          <Route path="contact" element={<ContactPage />} /> 
-          */}
+
         </Route>
+
+        <Route path="/admin" element={<AdminLayout />}>
+
+          <Route index element={<AdminDashboard />} />
+          <Route path="inventory" element={<AdminInventory />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="stores" element={<AdminStores />} />
+          <Route path="users" element={<AdminUsers />} />
+
+        </Route>
+
       </Routes>
     </BrowserRouter>
   );
