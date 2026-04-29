@@ -1,6 +1,18 @@
 // src/pages/admin/Stores.jsx
 import { useState, useEffect } from 'react';
 
+const INITIAL_STORES_DATA = [
+  { id: 1, name: "Briselli - Las Palmeras", address: "Av. Las Palmeras 4099, Los Olivos", coords: { lat: -11.986900008562472, lng: -77.07252834238831 }, status: 'Activo' },
+  { id: 2, name: "Briselli - Antunez de Mayolo", address: "Av. Santiago Antunez de Mayolo 1639, Los Olivos", coords: { lat: -11.996172457316801, lng: -77.08373327552152 }, status: 'Activo' },
+  { id: 3, name: "Briselli - Angélica Gamarra", address: "Av. Angélica Gamarra 1904, Los Olivos", coords: { lat: -12.006227911665578, lng: -77.08198680680607 }, status: 'Activo' },
+  { id: 4, name: "Briselli - Universitaria", address: "Av. Universitaria 6117, Los Olivos 15314", coords: { lat: -11.963674409044833, lng: -77.07214010005937 }, status: 'Activo' },
+  { id: 5, name: "Briselli - Huandoy", address: "Av. A Los Olivos, Cercado de Lima 15306", coords: { lat: -11.963674409044833, lng: -77.07771674666107 }, status: 'Activo' },
+  { id: 6, name: "Briselli - Alfa", address: "Av. Alfa 2171, Los Olivos 15302", coords: { lat: -12.006515670569831, lng: -77.06959673749027 }, status: 'Activo' },
+  { id: 7, name: "Briselli - Mexico", address: "Mexico 488, Comas 15311", coords: { lat: -11.955191527513517, lng: -77.05951937797056 }, status: 'Activo' },
+  { id: 8, name: "Briselli - Tupac", address: "Av. Túpac Amaru 735, Lima 15311", coords: { lat: -11.959675708249497, lng: -77.05402315343272 }, status: 'Activo' },
+  { id: 9, name: "Briselli - German Aguirre", address: "Av. Germán Aguirre 1199, SMP 15103", coords: { lat: -12.019266332865481, lng: -77.0760052178505 }, status: 'Activo' }
+];
+
 export default function AdminStores() {
   const [stores, setStores] = useState([]);
 
@@ -9,61 +21,36 @@ export default function AdminStores() {
     if (saved) {
       setStores(JSON.parse(saved));
     } else {
-      // Si es la primera vez, cargamos tus sedes base con estado 'Activo'
-      const initialStores = [
-        { id: 1, name: "Briselli - Las Palmeras", address: "Av. Las Palmeras 4099", status: 'Activo' },
-        { id: 2, name: "Briselli - Antunez de Mayolo", address: "Av. Antunez de Mayolo 1639", status: 'Activo' },
-        // ... (Agrega las demás sedes aquí)
-      ];
-      setStores(initialStores);
-      localStorage.setItem('briselli_stores', JSON.stringify(initialStores));
+      setStores(INITIAL_STORES_DATA);
+      localStorage.setItem('briselli_stores', JSON.stringify(INITIAL_STORES_DATA));
     }
   }, []);
 
   const toggleStatus = (id) => {
-    const updated = stores.map(s => {
-      if (s.id === id) {
-        return { ...s, status: s.status === 'Activo' ? 'Inactivo' : 'Activo' };
-      }
-      return s;
-    });
+    const updated = stores.map(s => 
+      s.id === id ? { ...s, status: s.status === 'Activo' ? 'Inactivo' : 'Activo' } : s
+    );
     setStores(updated);
     localStorage.setItem('briselli_stores', JSON.stringify(updated));
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-black text-artisan-primary uppercase tracking-tighter">Estado de Sedes</h2>
-        <p className="text-gray-400 text-sm font-medium">Habilita o deshabilita las tiendas que verán los clientes.</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {stores.map((s) => (
-          <div key={s.id} className={`p-5 rounded-2xl border-2 transition-all flex justify-between items-center ${
-            s.status === 'Activo' ? 'bg-white border-green-100' : 'bg-gray-50 border-gray-200 opacity-75'
-          }`}>
+    <div className="p-6 space-y-6">
+      <h2 className="text-2xl font-black text-[#8B572A] uppercase">Estado de Sedes</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {stores.map(s => (
+          <div key={s.id} className={`p-4 rounded-xl border transition-all flex justify-between items-center bg-white ${s.status === 'Activo' ? 'border-orange-100 shadow-sm' : 'border-gray-200 opacity-60'}`}>
             <div>
-              <h3 className={`font-black uppercase text-sm ${s.status === 'Activo' ? 'text-artisan-primary' : 'text-gray-400'}`}>
-                {s.name}
-              </h3>
-              <p className="text-[11px] text-gray-500 font-medium">{s.address}</p>
-              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full mt-2 inline-block ${
-                s.status === 'Activo' ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-500'
-              }`}>
+              <p className="font-bold text-sm text-[#554336]">{s.name}</p>
+              <p className={`text-[10px] font-black uppercase ${s.status === 'Activo' ? 'text-green-600' : 'text-red-500'}`}>
                 {s.status}
-              </span>
+              </p>
             </div>
-            
             <button 
               onClick={() => toggleStatus(s.id)}
-              className={`w-14 h-7 rounded-full relative transition-colors ${
-                s.status === 'Activo' ? 'bg-artisan-secondary' : 'bg-gray-300'
-              }`}
+              className={`w-12 h-6 rounded-full transition-all relative ${s.status === 'Activo' ? 'bg-[#8B572A]' : 'bg-gray-300'}`}
             >
-              <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all ${
-                s.status === 'Activo' ? 'left-8' : 'left-1'
-              }`} />
+              <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${s.status === 'Activo' ? 'left-7' : 'left-1'}`} />
             </button>
           </div>
         ))}
