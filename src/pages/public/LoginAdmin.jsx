@@ -12,71 +12,81 @@ const Login = () => {
         id: 'master-01',
         firstName: 'Piero',
         lastName: 'Bellido',
-        email: 'piero@briselli.com', 
-        password: 'admin123',         
+        email: 'piero@briselli.com',
+        password: 'admin123',
         role: 'admin',
         status: 'Activo'
     };
 
     const handleAuth = (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    const storedUsers = JSON.parse(localStorage.getItem('briselli_users')) || [];    
-    const allUsers = [...storedUsers];
-    const adminExists = allUsers.find(u => u.email === DEFAULT_ADMIN.email);
-    if (!adminExists) {
-        allUsers.push(DEFAULT_ADMIN);
-    }
+        const storedUsers = JSON.parse(localStorage.getItem('briselli_users')) || [];
+        const allUsers = [...storedUsers];
+        const adminExists = allUsers.find(u => u.email === DEFAULT_ADMIN.email);
+        if (!adminExists) {
+            allUsers.push(DEFAULT_ADMIN);
+        }
 
-    if (isLogin) {
-        const userFound = allUsers.find(u => 
-            u.email.toLowerCase() === email.toLowerCase() && 
-            u.password === password
-        );
+        if (isLogin) {
+            const userFound = allUsers.find(u =>
+                u.email.toLowerCase() === email.toLowerCase() &&
+                u.password === password
+            );
 
-        if (userFound) {
-            localStorage.setItem('briselli_auth', JSON.stringify(userFound));
+            if (userFound) {
+                localStorage.setItem('briselli_auth', JSON.stringify(userFound));
 
-            if (!adminExists && userFound.role === 'admin') {
-                localStorage.setItem('briselli_users', JSON.stringify([...storedUsers, DEFAULT_ADMIN]));
-            }
+                if (!adminExists && userFound.role === 'admin') {
+                    localStorage.setItem('briselli_users', JSON.stringify([...storedUsers, DEFAULT_ADMIN]));
+                }
 
-            if (userFound.role.toLowerCase() === 'admin') {
-                navigate('/admin');
+                if (userFound.role.toLowerCase() === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/account');
+                }
             } else {
-                navigate('/account');
+                alert("Correo o contraseña incorrectos.");
             }
         } else {
-            alert("Correo o contraseña incorrectos.");
-        }
-    } else {
-        // --- LÓGICA DE REGISTRO ---
-        if (allUsers.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-            return alert("Este correo ya está registrado.");
-        }
+            // --- LÓGICA DE REGISTRO ---
+            if (allUsers.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+                return alert("Este correo ya está registrado.");
+            }
 
-        const newUser = {
-            firstName: name,
-            lastName: '',
-            email: email,
-            password: password,
-            role: 'user',
-            dni: '',
-            phone: '',
-            address: '',
-            status: 'Activo'
-        };
+            const newUser = {
+                firstName: name,
+                lastName: '',
+                email: email,
+                password: password,
+                role: 'user',
+                dni: '',
+                phone: '',
+                address: '',
+                status: 'Activo'
+            };
 
-        const updatedUsers = [...storedUsers, newUser];
-        localStorage.setItem('briselli_users', JSON.stringify(updatedUsers));
-        localStorage.setItem('briselli_active_user', JSON.stringify(newUser));
-        
-        navigate('/account');
-    }
-};
+            const updatedUsers = [...storedUsers, newUser];
+            localStorage.setItem('briselli_users', JSON.stringify(updatedUsers));
+            localStorage.setItem('briselli_active_user', JSON.stringify(newUser));
+
+            navigate('/account');
+        }
+    };
 
     return (
+
         <div className="min-h-screen flex items-center justify-center bg-[#fcf9f8] font-sans p-6 animate-fadeIn">
+            <button
+                onClick={() => navigate('/')}
+                className="absolute top-8 left-8 flex items-center gap-2 text-artisan-dark/50 hover:text-artisan-primary transition-colors font-bold text-xs uppercase tracking-widest"
+            >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver a la tienda
+            </button>
             <main className="w-full max-w-[440px]">
                 <div className="bg-white p-8 rounded-3xl shadow-xl shadow-orange-900/5 border border-orange-100 flex flex-col items-center">
 
@@ -137,7 +147,7 @@ const Login = () => {
                         </button>
                     </form>
 
-                    <button 
+                    <button
                         onClick={() => setIsLogin(!isLogin)}
                         className="mt-6 text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter"
                     >

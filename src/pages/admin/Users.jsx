@@ -5,13 +5,13 @@ export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  // Se añade 'password' al estado inicial
-  const [formData, setFormData] = useState({ 
-    name: '', 
-    email: '', 
-    password: '', 
-    role: 'Vendedor', 
-    status: 'Activo' 
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    role: 'user',
+    status: 'Activo'
   });
 
   useEffect(() => {
@@ -19,14 +19,14 @@ export default function AdminUsers() {
     if (saved) {
       setUsers(JSON.parse(saved));
     } else {
-      // Usuario inicial con password para el primer acceso
-      const initialUsers = [{ 
-        id: 1, 
-        name: 'Piero Admin', 
-        email: 'piero@briselli.com', 
-        password: 'admin123', 
-        role: 'Admin', 
-        status: 'Activo' 
+      const initialUsers = [{
+        id: 1,
+        firstName: 'Piero',
+        lastName: 'Bellido',
+        email: 'piero@briselli.com',
+        password: 'admin123',
+        role: 'admin', // MINÚSCULAS
+        status: 'Activo'
       }];
       setUsers(initialUsers);
       localStorage.setItem('briselli_users', JSON.stringify(initialUsers));
@@ -40,11 +40,18 @@ export default function AdminUsers() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const userToSave = {
+      ...formData,
+      role: formData.role.toLowerCase(), // Esto es vital: "Admin" -> "admin"
+      id: editingUser ? editingUser.id : Date.now()
+    };
+
     if (editingUser) {
-      const updated = users.map(u => u.id === editingUser.id ? { ...formData, id: u.id } : u);
+      const updated = users.map(u => u.id === editingUser.id ? userToSave : u);
       saveUsers(updated);
     } else {
-      saveUsers([...users, { ...formData, id: Date.now() }]);
+      saveUsers([...users, userToSave]);
     }
     closeModal();
   };
@@ -71,7 +78,7 @@ export default function AdminUsers() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-black text-artisan-primary tracking-tighter uppercase">Personal Briselli</h2>
-        <button 
+        <button
           onClick={() => setShowModal(true)}
           className="bg-artisan-secondary text-white px-6 py-2 rounded-xl font-bold hover:bg-artisan-primary transition-all shadow-lg"
         >
@@ -96,9 +103,8 @@ export default function AdminUsers() {
                   <p className="text-[10px] text-gray-400 font-mono">{u.email}</p>
                 </td>
                 <td className="p-5">
-                  <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase border ${
-                    u.role === 'Admin' ? 'border-purple-200 text-purple-600 bg-purple-50' : 'border-blue-200 text-blue-600 bg-blue-50'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase border ${u.role === 'Admin' ? 'border-purple-200 text-purple-600 bg-purple-50' : 'border-blue-200 text-blue-600 bg-blue-50'
+                    }`}>
                     {u.role}
                   </span>
                 </td>
@@ -123,46 +129,46 @@ export default function AdminUsers() {
                 {editingUser ? 'Editar Empleado' : 'Nuevo Registro'}
               </h3>
             </div>
-            
+
             <div className="p-6 space-y-4">
               <div>
                 <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Nombre Completo</label>
-                <input 
+                <input
                   required
                   className="w-full border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-artisan-secondary transition-all"
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
               </div>
 
               <div>
                 <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Correo Institucional</label>
-                <input 
+                <input
                   type="email" required
                   className="w-full border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-artisan-secondary transition-all"
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
 
               {/* NUEVO CAMPO DE CONTRASEÑA */}
               <div>
                 <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Contraseña de Acceso</label>
-                <input 
+                <input
                   type="password" required
                   placeholder="Mínimo 6 caracteres"
                   className="w-full border-2 border-gray-100 p-3 rounded-2xl outline-none focus:border-artisan-secondary transition-all font-mono"
                   value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
               </div>
 
               <div>
                 <label className="text-[10px] font-black uppercase text-gray-400 ml-1">Rol en la Pastelería</label>
-                <select 
+                <select
                   className="w-full border-2 border-gray-100 p-3 rounded-2xl outline-none appearance-none bg-white"
                   value={formData.role}
-                  onChange={(e) => setFormData({...formData, role: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                 >
                   <option value="Vendedor">Vendedor / Cajero</option>
                   <option value="Admin">Administrador General</option>
