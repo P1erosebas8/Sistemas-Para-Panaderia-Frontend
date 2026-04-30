@@ -10,7 +10,7 @@ const AboutSection = () => {
             {/* Imagen Principal */}
             <div className="aspect-[4/5] bg-artisan-tertiary/20 rounded-lg overflow-hidden shadow-xl transform -rotate-3 z-10 relative border-8 border-white">
               <img 
-                src="src/assets/PasteleríaFinaBriselli.png" // Aquí pondrás la foto de su local antiguo o producción
+                src="/pasteleria-fina-briselli.png"
                 alt="Tradición en Pastelería Briselli" 
                 className="w-full h-full"
               />
