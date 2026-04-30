@@ -1,8 +1,9 @@
 // src/components/layout/UserLayout.jsx
-import { useState, useEffect } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { useState, useEffect,  } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 
 export default function UserLayout() {
+    const navigate = useNavigate();
     const links = [
         { name: 'Mi Perfil', path: '/account', icon: '👤' },
         { name: 'Mis Compras', path: '/account/orders', icon: '🛍️' },
@@ -15,7 +16,16 @@ export default function UserLayout() {
             setUserName(`${activeUser.firstName} ${activeUser.lastName}`);
         }
     };
+    const handleLogout = () => {
+        localStorage.removeItem('briselli_auth');
 
+        // Limpiar otros datos temporales si los tuvieras
+        // localStorage.removeItem('briselli_cart'); // Por ejemplo, si quieres vaciar el carrito al salir
+
+        navigate('/login', { replace: true });
+
+         window.location.reload(); 
+    };
     useEffect(() => {
         loadUserData();
     }, []);
@@ -44,8 +54,12 @@ export default function UserLayout() {
                             {link.name}
                         </NavLink>
                     ))}
-                    <button className="w-full flex items-center gap-3 px-6 py-4 rounded-2xl font-bold text-red-400 hover:bg-red-50 transition-all mt-4">
-                        <span>🚪</span> Cerrar Sesión
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 px-6 py-4 w-full text-left text-red-500 font-black uppercase text-[10px] tracking-widest hover:bg-red-50 transition-all rounded-2xl mt-auto border border-transparent hover:border-red-100"
+                    >
+                        <span className="text-lg">🚪</span>
+                        Cerrar Sesión
                     </button>
                 </nav>
             </aside>
