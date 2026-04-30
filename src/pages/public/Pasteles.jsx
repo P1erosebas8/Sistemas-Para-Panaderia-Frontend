@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { addProductToCartFlow } from "../../utils/cartFlow";
 
-const pasteles = [
+export const pasteles = [
   // ── TORTAS CLÁSICAS ──────────────────────────────────────────────
   {
     id: 1,
@@ -238,6 +239,12 @@ const etiquetaColor = {
 export default function Pasteles() {
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [pastelSeleccionado, setPastelSeleccionado] = useState(null);
+  const [toastVisible, setToastVisible] = useState(false);
+
+  const showAddToast = () => {
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 1800);
+  };
 
   const filtrados = pasteles.filter(p => 
     categoriaActiva === "Todas" || p.categoria === categoriaActiva
@@ -406,9 +413,9 @@ export default function Pasteles() {
           ? gruposPorCategoria.map(cat => {
               const grupo = itemsRestantes.filter(p => p.categoria === cat);
               if (grupo.length === 0) return null;
-              return <Seccion key={cat} titulo={cat} items={grupo} onAbrirModal={setPastelSeleccionado} />;
+              return <Seccion key={cat} titulo={cat} items={grupo} onAbrirModal={setPastelSeleccionado} onAddSuccess={showAddToast} />;
             })
-          : <Seccion titulo={categoriaActiva} items={filtrados} onAbrirModal={setPastelSeleccionado} />
+          : <Seccion titulo={categoriaActiva} items={filtrados} onAbrirModal={setPastelSeleccionado} onAddSuccess={showAddToast} />
         }
 
         {/* ── Seasonal Highlight Section ── */}
@@ -446,7 +453,13 @@ export default function Pasteles() {
       </main>
 
       {/* ── MODAL PROPORCIONAL DE DETALLES ── */}
-      <ModalPastel pastel={pastelSeleccionado} onClose={() => setPastelSeleccionado(null)} />
+      <ModalPastel pastel={pastelSeleccionado} onClose={() => setPastelSeleccionado(null)} onAddSuccess={showAddToast} />
+
+      {toastVisible && (
+        <div className="fixed bottom-6 right-6 z-[60] bg-[#165128] text-white px-4 py-3 rounded-xl shadow-xl font-bold text-sm">
+          Se anadio correctamente al carrito
+        </div>
+      )}
 
     </div>
   );
@@ -454,7 +467,7 @@ export default function Pasteles() {
 
 // ── Componentes Auxiliares ──
 
-function Seccion({ titulo, items, onAbrirModal }) {
+function Seccion({ titulo, items, onAbrirModal, onAddSuccess }) {
   return (
     <div className="mb-20">
       <div className="flex items-center gap-4 mb-8">
@@ -464,7 +477,7 @@ function Seccion({ titulo, items, onAbrirModal }) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
         {items.map(pastel => (
-          <TarjetaPastel key={pastel.id} pastel={pastel} onAbrirModal={onAbrirModal} />
+          <TarjetaPastel key={pastel.id} pastel={pastel} onAbrirModal={onAbrirModal} onAddSuccess={onAddSuccess} />
         ))}
       </div>
     </div>
@@ -472,7 +485,7 @@ function Seccion({ titulo, items, onAbrirModal }) {
 }
 
 // ── TARJETA INDIVIDUAL DE PRODUCTO ──
-function TarjetaPastel({ pastel, onAbrirModal }) {
+function TarjetaPastel({ pastel, onAbrirModal, onAddSuccess }) {
   const colores = pastel.etiqueta ? etiquetaColor[pastel.etiqueta] : null;
 
   return (
@@ -503,17 +516,23 @@ function TarjetaPastel({ pastel, onAbrirModal }) {
           </p>
         </div>
         
-        <GrupoBotones pastel={pastel} onAbrirModal={onAbrirModal} />
+        <GrupoBotones pastel={pastel} onAbrirModal={onAbrirModal} onAddSuccess={onAddSuccess} />
       </div>
     </div>
   );
 }
 
 // ── COMPONENTE DE BOTONES PARA CARDS ──
-function GrupoBotones({ pastel, onAbrirModal, bgOscuro = false }) {
+function GrupoBotones({ pastel, onAbrirModal, onAddSuccess, bgOscuro = false }) {
   const [agregado, setAgregado] = useState(false);
   
   const handleAgregar = () => {
+    const result = addProductToCartFlow(pastel);
+    if (!result.ok) {
+      alert(result.message);
+      return;
+    }
+    onAddSuccess?.();
     setAgregado(true);
     setTimeout(() => setAgregado(false), 1500);
   };
@@ -546,7 +565,7 @@ function GrupoBotones({ pastel, onAbrirModal, bgOscuro = false }) {
 }
 
 // ── COMPONENTE MODAL PROPORCIONAL ──
-function ModalPastel({ pastel, onClose }) {
+function ModalPastel({ pastel, onClose, onAddSuccess }) {
   const [agregado, setAgregado] = useState(false);
 
   if (!pastel) return null;
@@ -554,6 +573,12 @@ function ModalPastel({ pastel, onClose }) {
   const colores = pastel.etiqueta ? etiquetaColor[pastel.etiqueta] : null;
 
   const handleAgregarModal = () => {
+    const result = addProductToCartFlow(pastel);
+    if (!result.ok) {
+      alert(result.message);
+      return;
+    }
+    onAddSuccess?.();
     setAgregado(true);
     setTimeout(() => { setAgregado(false); onClose(); }, 1200);
   };

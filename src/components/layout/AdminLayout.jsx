@@ -2,13 +2,14 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import AdminSidebar from '../../components/admin/AdminSidebar';
+import { clearAuthSession, getAuthSession } from '../../utils/authSession';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authUser, setAuthUser] = useState(null);
   useEffect(() => {
-    const session = JSON.parse(localStorage.getItem('briselli_auth'));
+    const session = getAuthSession();
 
     if (!session || session.role !== 'admin') {
       console.error("Acceso no autorizado");
@@ -38,7 +39,7 @@ export default function AdminLayout() {
             </span>
           </div>
           <button
-            onClick={() => { localStorage.removeItem('briselli_auth'); window.location.reload(); }}
+            onClick={() => { clearAuthSession(); window.location.reload(); }}
             className="text-xs font-bold text-red-400 hover:text-red-600 transition-colors"
           >
             SALIR

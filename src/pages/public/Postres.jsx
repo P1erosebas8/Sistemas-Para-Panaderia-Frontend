@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { addProductToCartFlow } from "../../utils/cartFlow";
 
 const postres = [
   {
@@ -97,6 +98,12 @@ const etiquetaColor = {
 export default function Postres() {
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [postreSeleccionado, setPostreSeleccionado] = useState(null);
+  const [toastVisible, setToastVisible] = useState(false);
+
+  const showAddToast = () => {
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 1800);
+  };
 
   const filtrados = postres.filter(p =>
     categoriaActiva === "Todas" || p.categoria === categoriaActiva
@@ -263,9 +270,9 @@ export default function Postres() {
           ? gruposPorCategoria.map(cat => {
               const grupo = itemsRestantes.filter(p => p.categoria === cat);
               if (grupo.length === 0) return null;
-              return <Seccion key={cat} titulo={cat} items={grupo} onAbrirModal={setPostreSeleccionado} />;
+              return <Seccion key={cat} titulo={cat} items={grupo} onAbrirModal={setPostreSeleccionado} onAddSuccess={showAddToast} />;
             })
-          : <Seccion titulo={categoriaActiva} items={filtrados} onAbrirModal={setPostreSeleccionado} />
+          : <Seccion titulo={categoriaActiva} items={filtrados} onAbrirModal={setPostreSeleccionado} onAddSuccess={showAddToast} />
         }
 
         {/* ── Seasonal Highlight Section ── */}
@@ -307,14 +314,20 @@ export default function Postres() {
       </main>
 
       {/* ── MODAL DE DETALLES ── */}
-      <ModalPostre postre={postreSeleccionado} onClose={() => setPostreSeleccionado(null)} />
+      <ModalPostre postre={postreSeleccionado} onClose={() => setPostreSeleccionado(null)} onAddSuccess={showAddToast} />
+
+      {toastVisible && (
+        <div className="fixed bottom-6 right-6 z-[60] bg-[#165128] text-white px-4 py-3 rounded-xl shadow-xl font-bold text-sm">
+          Se anadio correctamente al carrito
+        </div>
+      )}
     </div>
   );
 }
 
 // ── Componentes Auxiliares ──
 
-function Seccion({ titulo, items, onAbrirModal }) {
+function Seccion({ titulo, items, onAbrirModal, onAddSuccess }) {
   return (
     <div className="mb-20">
       <div className="flex items-center gap-4 mb-8">
@@ -324,7 +337,7 @@ function Seccion({ titulo, items, onAbrirModal }) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
         {items.map(postre => (
-          <TarjetaPostre key={postre.id} postre={postre} onAbrirModal={onAbrirModal} />
+          <TarjetaPostre key={postre.id} postre={postre} onAbrirModal={onAbrirModal} onAddSuccess={onAddSuccess} />
         ))}
       </div>
     </div>
@@ -332,7 +345,7 @@ function Seccion({ titulo, items, onAbrirModal }) {
 }
 
 // ── TARJETA INDIVIDUAL DE PRODUCTO ──
-function TarjetaPostre({ postre, onAbrirModal }) {
+function TarjetaPostre({ postre, onAbrirModal, onAddSuccess }) {
   const colores = postre.etiqueta ? etiquetaColor[postre.etiqueta] : null;
 
   return (
@@ -363,17 +376,23 @@ function TarjetaPostre({ postre, onAbrirModal }) {
           </p>
         </div>
 
-        <GrupoBotones postre={postre} onAbrirModal={onAbrirModal} />
+        <GrupoBotones postre={postre} onAbrirModal={onAbrirModal} onAddSuccess={onAddSuccess} />
       </div>
     </div>
   );
 }
 
 // ── COMPONENTE DE BOTONES PARA CARDS ──
-function GrupoBotones({ postre, onAbrirModal, bgOscuro = false }) {
+function GrupoBotones({ postre, onAbrirModal, onAddSuccess, bgOscuro = false }) {
   const [agregado, setAgregado] = useState(false);
 
   const handleAgregar = () => {
+    const result = addProductToCartFlow(postre);
+    if (!result.ok) {
+      alert(result.message);
+      return;
+    }
+    onAddSuccess?.();
     setAgregado(true);
     setTimeout(() => setAgregado(false), 1500);
   };
@@ -401,7 +420,7 @@ function GrupoBotones({ postre, onAbrirModal, bgOscuro = false }) {
 }
 
 // ── MODAL DE DETALLES ──
-function ModalPostre({ postre, onClose }) {
+function ModalPostre({ postre, onClose, onAddSuccess }) {
   const [agregado, setAgregado] = useState(false);
 
   if (!postre) return null;
@@ -409,6 +428,12 @@ function ModalPostre({ postre, onClose }) {
   const colores = postre.etiqueta ? etiquetaColor[postre.etiqueta] : null;
 
   const handleAgregarModal = () => {
+    const result = addProductToCartFlow(postre);
+    if (!result.ok) {
+      alert(result.message);
+      return;
+    }
+    onAddSuccess?.();
     setAgregado(true);
     setTimeout(() => { setAgregado(false); onClose(); }, 1200);
   };

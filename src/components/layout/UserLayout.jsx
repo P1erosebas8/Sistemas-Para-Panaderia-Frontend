@@ -1,6 +1,7 @@
 // src/components/layout/UserLayout.jsx
 import { useState, useEffect,  } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { clearAuthSession, getAuthSession } from '../../utils/authSession';
 
 export default function UserLayout() {
     const navigate = useNavigate();
@@ -11,13 +12,13 @@ export default function UserLayout() {
     const [userName, setUserName] = useState('Usuario');
 
     const loadUserData = () => {
-        const activeUser = JSON.parse(localStorage.getItem('briselli_auth'));
+        const activeUser = getAuthSession();
         if (activeUser && activeUser.firstName) {
             setUserName(`${activeUser.firstName} ${activeUser.lastName}`);
         }
     };
     const handleLogout = () => {
-        localStorage.removeItem('briselli_auth');
+        clearAuthSession();
 
         // Limpiar otros datos temporales si los tuvieras
         // localStorage.removeItem('briselli_cart'); // Por ejemplo, si quieres vaciar el carrito al salir

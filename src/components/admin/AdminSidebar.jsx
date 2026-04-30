@@ -1,5 +1,6 @@
 // src/components/admin/AdminSidebar.jsx
 import { Link, useLocation } from 'react-router-dom';
+import { clearAuthSession } from '../../utils/authSession';
 
 const menuItems = [
     { name: 'Dashboard', path: '/admin', icon: '📊' },
@@ -37,7 +38,7 @@ export default function AdminSidebar() {
             </nav>
 
             <div className="p-6 border-t border-artisan-tertiary">
-                <button className="flex font-black items-center space-x-3 text-l opacity-70 hover:opacity-100 transition-opacity w-full" onClick={() => { localStorage.removeItem('briselli_auth'); window.location.reload(); }}>
+                <button className="flex font-black items-center space-x-3 text-l opacity-70 hover:opacity-100 transition-opacity w-full" onClick={() => { clearAuthSession(); window.location.reload(); }}>
                 <span>🚪</span>
                 <span>Cerrar Sesión</span>
             </button>
