@@ -13,6 +13,7 @@ import Home from "./pages/public/Home";
 import UserLayout from './components/layout/UserLayout'
 import UserProfile from './pages/user/Profile'
 import UserOrders from './pages/user/OrdersU'
+import PastelesPage from './pages/public/Pasteles';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="about" element={<AboutSection />} />
           <Route path="ubicanos" element={<LocationPage />} />
+          <Route path="pasteles" element={<PastelesPage />} />
 
           <Route path="account" element={<UserLayout />}>
 
