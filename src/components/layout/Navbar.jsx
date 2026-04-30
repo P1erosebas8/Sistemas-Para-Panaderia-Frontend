@@ -55,7 +55,7 @@ export default function Navbar() {
       <div className="flex items-center justify-between px-6 py-4 mx-auto">
 
         <Link to="/" className="text-2xl font-bold">
-          Panaderia Fina Briselli
+          Pasteleria Fina Briselli
         </Link>
 
         <div className="hidden md:flex space-x-8">
@@ -64,13 +64,6 @@ export default function Navbar() {
             className={({ isActive }) => isActive ? activeStyles : linkStyles}
           >
             Postres
-          </NavLink>
-
-          <NavLink
-            to="/panes"
-            className={({ isActive }) => isActive ? activeStyles : linkStyles}
-          >
-            Panes
           </NavLink>
 
           <NavLink
