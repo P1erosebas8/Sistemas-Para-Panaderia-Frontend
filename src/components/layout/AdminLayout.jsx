@@ -30,10 +30,9 @@ export default function AdminLayout() {
               {authUser.role}
             </span>
             <span className="text-artisan-dark font-semibold italic">
-              Panel Briselli — {authUser.name}
+              Panel Briselli — {authUser.firstName} {authUser.lastName}
             </span>
           </div>
-          {/* Botón rápido para cerrar sesión */}
           <button
             onClick={() => { localStorage.removeItem('briselli_auth'); window.location.reload(); }}
             className="text-xs font-bold text-red-400 hover:text-red-600 transition-colors"
