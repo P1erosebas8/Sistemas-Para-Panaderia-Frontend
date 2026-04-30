@@ -21,7 +21,7 @@ export const panesCatalog = [
 export default function ProductGrid() {
   return (
     <section className="py-16 max-w-7xl mx-auto px-6">
-      <h2 className="text-3xl font-bold mb-8">Today's Selection</h2>
+      <h2 className="text-3xl font-bold mb-8">Destacados</h2>
 
       <div className="grid md:grid-cols-3 gap-6">
         {panesCatalog.map((p, i) => (
