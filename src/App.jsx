@@ -10,12 +10,15 @@ import AdminUsers from './pages/admin/Users';
 import Login from './pages/public/LoginAdmin';
 import AdminStores from './pages/admin/Stores';
 import Home from "./pages/public/Home";
+import UserLayout from './components/layout/UserLayout'
+import UserProfile from './pages/user/Profile'
+import UserOrders from './pages/user/OrdersU'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        
+
         <Route path="login" element={<Login />}></Route>
 
         <Route path="/" element={<MainLayout />}>
@@ -23,6 +26,13 @@ function App() {
           <Route index element={<Home />} />
           <Route path="about" element={<AboutSection />} />
           <Route path="ubicanos" element={<LocationPage />} />
+
+          <Route path="account" element={<UserLayout />}>
+
+            <Route index element={<UserProfile />} />
+            <Route path="orders" element={<UserOrders />} />
+
+          </Route>
 
         </Route>
 
