@@ -1,6 +1,7 @@
 // src/pages/user/Profile.jsx
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { getAuthSession, setAuthSession } from '../../utils/authSession';
 
 export default function UserProfile() {
     const { onProfileUpdate } = useOutletContext(); // Obtenemos la función del padre
@@ -16,7 +17,7 @@ export default function UserProfile() {
     const [message, setMessage] = useState({ type: '', text: '' });
 
     useEffect(() => {
-        const activeUser = JSON.parse(localStorage.getItem('briselli_auth'));
+        const activeUser = getAuthSession();
         if (activeUser) {
             setFormData(activeUser);
         }
@@ -41,7 +42,7 @@ export default function UserProfile() {
             return setMessage({ type: 'error', text: 'El teléfono debe tener 9 dígitos.' });
         }
 
-        localStorage.setItem('briselli_auth', JSON.stringify(formData));
+        setAuthSession(formData);
 
         const allUsers = JSON.parse(localStorage.getItem('briselli_users') || '[]');
         const updatedUsers = allUsers.map(u => u.email === formData.email ? formData : u);

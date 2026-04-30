@@ -14,38 +14,72 @@ export default function AdminDashboard() {
   });
 
   useEffect(() => {
-    // 1. Carga de Inventario
-    const savedInventory = JSON.parse(localStorage.getItem('briselli_inventory') || '[]');
-    
-    // 2. Carga de Personal
-    const savedUsers = JSON.parse(localStorage.getItem('briselli_users') || '[]');
-    const activeUsers = savedUsers.filter(u => u.status === 'Activo').length;
+    const normalizeCategory = (category) => {
+      const value = String(category || '').toLowerCase();
+      if (value.includes('pan')) return 'Panes';
+      if (value.includes('postre')) return 'Postres';
+      return 'Pasteles';
+    };
 
-    // 3. Carga de Sedes (Briselli Locations)
-    const savedStores = JSON.parse(localStorage.getItem('briselli_stores') || '[]');
-    const activeS = savedStores.filter(s => s.status === 'Activo').length;
-    const inactiveS = savedStores.length - activeS;
+    const isToday = (dateValue) => {
+      const parsed = new Date(dateValue);
+      if (Number.isNaN(parsed.getTime())) return false;
+      const now = new Date();
+      return (
+        parsed.getDate() === now.getDate() &&
+        parsed.getMonth() === now.getMonth() &&
+        parsed.getFullYear() === now.getFullYear()
+      );
+    };
 
-    const savedSales = JSON.parse(localStorage.getItem('briselli_sales_today') || '0');
-    const savedOrders = JSON.parse(localStorage.getItem('briselli_orders') || '[]');
+    const loadDashboardData = () => {
+      const savedInventory = JSON.parse(localStorage.getItem('briselli_inventory') || '[]');
+      const savedUsers = JSON.parse(localStorage.getItem('briselli_users') || '[]');
+      const savedStores = JSON.parse(localStorage.getItem('briselli_stores') || '[]');
+      const savedOrders = JSON.parse(localStorage.getItem('briselli_orders') || '[]');
 
-    const value = savedInventory.reduce((acc, p) => acc + (p.price * p.stock), 0);
-    const lowStock = savedInventory.filter(p => p.stock < 5).length;
-    const categories = savedInventory.reduce((acc, p) => {
-      acc[p.category] = (acc[p.category] || 0) + 1;
-      return acc;
-    }, { Pasteles: 0, Panes: 0, Postres: 0 });
+      const activeUsers = savedUsers.filter(u => u.status === 'Activo').length;
+      const activeS = savedStores.filter(s => s.status === 'Activo').length;
+      const inactiveS = savedStores.length - activeS;
 
-    setStats({
-      totalProducts: savedInventory.length,
-      inventoryValue: value,
-      lowStockCount: lowStock,
-      activeStaff: activeUsers,
-      pendingOrders: savedOrders.length, 
-      totalSalesDay: parseFloat(savedSales),
-      byCategory: categories,
-      storesInfo: { active: activeS, inactive: inactiveS, total: savedStores.length }
-    });
+      const value = savedInventory.reduce((acc, p) => acc + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
+      const lowStock = savedInventory.filter(p => (Number(p.stock) || 0) < 5).length;
+      const categories = savedInventory.reduce((acc, p) => {
+        const normalized = normalizeCategory(p.category);
+        acc[normalized] = (acc[normalized] || 0) + 1;
+        return acc;
+      }, { Pasteles: 0, Panes: 0, Postres: 0 });
+
+      const todaySales = savedOrders
+        .filter((order) => isToday(order.date))
+        .reduce((acc, order) => acc + (Number(order.total) || 0), 0);
+
+      const pendingOrders = savedOrders.filter(
+        (order) => String(order.status || '').toLowerCase() === 'pendiente'
+      ).length;
+
+      setStats({
+        totalProducts: savedInventory.length,
+        inventoryValue: value,
+        lowStockCount: lowStock,
+        activeStaff: activeUsers,
+        pendingOrders,
+        totalSalesDay: todaySales,
+        byCategory: categories,
+        storesInfo: { active: activeS, inactive: inactiveS, total: savedStores.length }
+      });
+    };
+
+    const onStorage = (event) => {
+      const keys = ['briselli_inventory', 'briselli_orders', 'briselli_users', 'briselli_stores'];
+      if (!event.key || keys.includes(event.key)) {
+        loadDashboardData();
+      }
+    };
+
+    loadDashboardData();
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   return (

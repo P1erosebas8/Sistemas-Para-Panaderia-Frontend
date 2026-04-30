@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { setAuthSession } from '../../utils/authSession';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -8,6 +9,15 @@ const Login = () => {
     const [name, setName] = useState('');
     const navigate = useNavigate();
 
+    const DEFAULT_USER = {
+        id: 'user-01',
+        firstName: 'Piero',
+        lastName: 'Molina',
+        email: 'pieromolina@briselli.com',
+        password: 'admin123',
+        role: 'user',
+        status: 'Activo'
+    };
     const DEFAULT_ADMIN = {
         id: 'master-01',
         firstName: 'Piero',
@@ -23,10 +33,10 @@ const Login = () => {
 
         const storedUsers = JSON.parse(localStorage.getItem('briselli_users')) || [];
         const allUsers = [...storedUsers];
-        const adminExists = allUsers.find(u => u.email === DEFAULT_ADMIN.email);
-        if (!adminExists) {
-            allUsers.push(DEFAULT_ADMIN);
-        }
+        const defaultUserExists = allUsers.find(u => u.email === DEFAULT_USER.email);
+        const defaultAdminExists = allUsers.find(u => u.email === DEFAULT_ADMIN.email);
+        if (!defaultUserExists) allUsers.push(DEFAULT_USER);
+        if (!defaultAdminExists) allUsers.push(DEFAULT_ADMIN);
 
         if (isLogin) {
             const userFound = allUsers.find(u =>
@@ -35,16 +45,19 @@ const Login = () => {
             );
 
             if (userFound) {
-                localStorage.setItem('briselli_auth', JSON.stringify(userFound));
+                setAuthSession(userFound);
+                localStorage.setItem('briselli_active_user', JSON.stringify(userFound));
 
-                if (!adminExists && userFound.role === 'admin') {
-                    localStorage.setItem('briselli_users', JSON.stringify([...storedUsers, DEFAULT_ADMIN]));
+                if (!defaultUserExists || !defaultAdminExists) {
+                    localStorage.setItem('briselli_users', JSON.stringify(allUsers));
                 }
 
-                if (userFound.role.toLowerCase() === 'admin') {
+                const fullName = `${userFound.firstName || ''} ${userFound.lastName || ''}`.trim() || userFound.email;
+                alert(`Bienvenido ${fullName}`);
+                if (userFound.role?.toLowerCase() === 'admin') {
                     navigate('/admin');
                 } else {
-                    navigate('/account');
+                    navigate('/postres');
                 }
             } else {
                 alert("Correo o contraseña incorrectos.");
@@ -70,8 +83,11 @@ const Login = () => {
             const updatedUsers = [...storedUsers, newUser];
             localStorage.setItem('briselli_users', JSON.stringify(updatedUsers));
             localStorage.setItem('briselli_active_user', JSON.stringify(newUser));
+            setAuthSession(newUser);
 
-            navigate('/account');
+            const fullName = `${newUser.firstName || ''} ${newUser.lastName || ''}`.trim() || newUser.email;
+            alert(`Bienvenido ${fullName}`);
+            navigate('/postres');
         }
     };
 
