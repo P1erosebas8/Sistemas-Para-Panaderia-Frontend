@@ -9,7 +9,7 @@ export default function MainLayout() {
       <Navbar />
       
       {/* El pt-20 es para que el contenido no quede oculto bajo el Navbar fixed */}
-      <main className="flex-grow">
+      <main className="grow">
         <Outlet /> 
       </main>
 
