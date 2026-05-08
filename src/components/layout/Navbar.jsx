@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react'; 
+import { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { getAuthSession } from '../../utils/authSession';
+import logo from '../../assets/Briselli.png';
 
 export default function Navbar() {
+
   const linkStyles = "hover:text-amber-700 transition-colors";
-  const activeStyles = "text-amber-700 font-bold border-b-2 border-amber-700 pb-1";
+
+  const activeStyles =
+    "text-amber-700 font-bold border-b-2 border-amber-700 pb-1";
 
   const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
@@ -23,8 +27,13 @@ export default function Navbar() {
 
     const readCartCount = () => {
       try {
-        const cart = JSON.parse(localStorage.getItem('briselli_cart') || '[]');
-        const units = cart.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+        const cart = JSON.parse(
+          localStorage.getItem('briselli_cart') || '[]'
+        );
+        const units = cart.reduce(
+          (sum, item) => sum + (Number(item.quantity) || 0),
+          0
+        );
         setCartCount(units);
       } catch (error) {
         console.error("Error leyendo carrito:", error);
@@ -42,6 +51,7 @@ export default function Navbar() {
 
     checkSession();
     readCartCount();
+
     window.addEventListener('storage', readCartCount);
     window.addEventListener('briselli_cart_updated', onCartUpdated);
 
@@ -50,45 +60,66 @@ export default function Navbar() {
       window.removeEventListener('briselli_cart_updated', onCartUpdated);
     };
   }, [location]);
+
   return (
-    <nav className="fixed top-0 w-full z-50 border-b bg-[#FFFBF2] shadow-sm">
+    <nav className="fixed top-0 w-full z-50 border-b border-white/40 bg-[#FFFBF2]/50 backdrop-blur-lg shadow-sm transition-all duration-300">
       <div className="flex items-center justify-between px-6 py-4 mx-auto">
 
-        <Link to="/" className="text-2xl font-bold">
-          Pasteleria Fina Briselli
+        {/* LOGO */}
+        <Link 
+          to="/" 
+          onClick={(e) => e.currentTarget.blur()}
+          className="flex items-center outline-none focus:outline-none focus:ring-0 [-webkit-tap-highlight-color:transparent]"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
+        >
+          <img
+            src={logo}
+            alt="Briselli Logo"
+            className="h-14 w-auto object-contain select-none bg-transparent"
+            draggable="false"
+          />
         </Link>
 
+        {/* MENÚ */}
         <div className="hidden md:flex space-x-8">
           <NavLink
             to="/postres"
-            className={({ isActive }) => isActive ? activeStyles : linkStyles}
+            className={({ isActive }) =>
+              isActive ? activeStyles : linkStyles
+            }
           >
             Postres
           </NavLink>
 
           <NavLink
             to="/pasteles"
-            className={({ isActive }) => isActive ? activeStyles : linkStyles}
+            className={({ isActive }) =>
+              isActive ? activeStyles : linkStyles
+            }
           >
             Pasteles
           </NavLink>
 
           <NavLink
             to="/about"
-            className={({ isActive }) => isActive ? activeStyles : linkStyles}
+            className={({ isActive }) =>
+              isActive ? activeStyles : linkStyles
+            }
           >
             Nosotros
           </NavLink>
 
           <NavLink
             to="/ubicanos"
-            className={({ isActive }) => isActive ? activeStyles : linkStyles}
+            className={({ isActive }) =>
+              isActive ? activeStyles : linkStyles
+            }
           >
             Visítanos
           </NavLink>
-
         </div>
 
+        {/* DERECHA */}
         <div className="flex items-center gap-4">
           {user?.role?.toLowerCase() === 'user' && (
             <NavLink
@@ -103,11 +134,22 @@ export default function Navbar() {
               title="Carrito"
               aria-label="Carrito"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6 8L5.4 5M7 13l-1 5h12m-9 0a1 1 0 100 2 1 1 0 000-2zm8 0a1 1 0 100 2 1 1 0 000-2z" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6 8L5.4 5M7 13l-1 5h12m-9 0a1 1 0 100 2 1 1 0 000-2zm8 0a1 1 0 100 2 1 1 0 000-2z"
+                />
               </svg>
+
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[#8d4b00] text-white text-[10px] font-black flex items-center justify-center leading-none">
+                <span className="absolute -top-2 -right-2 min-w-4.5 h-4.5 px-1 rounded-full bg-[#8d4b00] text-white text-[10px] font-black flex items-center justify-center leading-none">
                   {cartCount}
                 </span>
               )}
@@ -131,6 +173,7 @@ export default function Navbar() {
             </Link>
           )}
         </div>
+
       </div>
     </nav>
   );
