@@ -1,58 +1,50 @@
 // src/pages/admin/Orders.jsx
 import { useState, useEffect } from 'react';
+import { orderService } from '../../services/orderService';
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState('Todos');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const removedTestOrderIds = new Set([
-      '#119678',
-      '#114438',
-      '#884023',
-      '#876083',
-      '#874025',
-    ]);
-
-    const isLegacyStaticOrder = (order) => {
-      const legacyIds = new Set(['#1001', '#1002']);
-      const legacyCustomers = new Set(['Piero Bellido', 'Maria Garcia']);
-      return (
-        legacyIds.has(order?.id) ||
-        legacyCustomers.has(order?.customer) ||
-        removedTestOrderIds.has(order?.id)
-      );
-    };
-
-    const loadOrders = () => {
-      const savedOrders = localStorage.getItem('briselli_orders');
-      if (savedOrders) {
-        const parsed = JSON.parse(savedOrders);
-        const cleaned = parsed.filter((order) => !isLegacyStaticOrder(order));
-        setOrders(cleaned);
-        localStorage.setItem('briselli_orders', JSON.stringify(cleaned));
-      } else {
-        setOrders([]);
-      }
-    };
-
-    const onStorage = (event) => {
-      if (!event.key || event.key === 'briselli_orders') {
-        loadOrders();
+    const loadOrders = async () => {
+      try {
+        const data = await orderService.getAllOrdersAdmin();
+        const mapped = data.map(o => ({
+          id: `#${String(o.id).padStart(6, '0')}`,
+          rawId: o.id,
+          customer: `Cliente ID: ${o.userId || 'N/A'}`,
+          date: o.orderDate,
+          total: o.totalAmount,
+          status: String(o.status || '').toUpperCase() === 'PENDING' ? 'Pendiente' : String(o.status || ''),
+          items: (o.items || []).map(item => `${item.quantity}x ${item.productName}`).join(', '),
+          originalItems: o.items || []
+        }));
+        
+        setOrders(mapped);
+      } catch (err) {
+        console.error('Error al cargar órdenes:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadOrders();
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-  const updateStatus = (id, newStatus) => {
-    const updated = orders.map(order => 
-      order.id === id ? { ...order, status: newStatus } : order
-    );
-    setOrders(updated);
-    localStorage.setItem('briselli_orders', JSON.stringify(updated));
+  const updateStatus = async (rawId, newStatus) => {
+    try {
+      // Backend probably expects 'ENTREGADO' or 'COMPLETED'
+      await orderService.updateOrderStatus(rawId, { status: 'ENTREGADO' });
+      const updated = orders.map(order => 
+        order.rawId === rawId ? { ...order, status: newStatus } : order
+      );
+      setOrders(updated);
+    } catch (err) {
+      console.error('Error actualizando estado:', err);
+      alert('Hubo un error al actualizar el estado.');
+    }
   };
 
   const filteredOrders = filter === 'Todos' 
@@ -80,7 +72,6 @@ export default function AdminOrders() {
   };
 
   const createVoucher = (order) => {
-    const items = getOrderItems(order.items);
     const subtotal = Number(order.total || 0);
     const igv = subtotal * 0.18;
     const total = subtotal;
@@ -88,22 +79,17 @@ export default function AdminOrders() {
     const now = new Date();
     const printDate = formatOrderDateTime(order.date || now.toISOString());
     const hour = now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const customerDoc = order.userEmail ? order.userEmail.toUpperCase() : 'SIN DOC.';
+    const customerDoc = 'SIN DOC.';
 
-    const rowsHtml = items
+    const rowsHtml = order.originalItems
       .map((item, index) => {
-        const parts = item.split('x ');
-        const qty = Number(parts[0]) || 1;
-        const description = parts[1] || item;
-        const unit = qty > 0 ? subtotal / qty / items.length : 0;
-        const rowTotal = unit * qty;
         return `
           <tr>
             <td class="num">${String(index + 1).padStart(2, '0')}</td>
-            <td class="num">${qty.toFixed(3)}</td>
-            <td class="desc">${description}</td>
-            <td class="money">S/ ${unit.toFixed(2)}</td>
-            <td class="money">S/ ${rowTotal.toFixed(2)}</td>
+            <td class="num">${(item.quantity || 1).toFixed(3)}</td>
+            <td class="desc">${item.productName || 'Producto'}</td>
+            <td class="money">S/ ${Number(item.price || 0).toFixed(2)}</td>
+            <td class="money">S/ ${Number(item.subTotal || 0).toFixed(2)}</td>
           </tr>
         `;
       })
@@ -294,6 +280,14 @@ export default function AdminOrders() {
     voucherWindow.print();
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64 animate-fadeIn">
+        <p className="text-xl font-bold text-artisan-primary">Cargando pedidos...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fadeIn">
       <div className="flex justify-between items-end">
@@ -354,7 +348,7 @@ export default function AdminOrders() {
                       ))}
                     </div>
                   </td>
-                  <td className="p-5 font-bold text-artisan-dark">S/ {order.total.toFixed(2)}</td>
+                  <td className="p-5 font-bold text-artisan-dark">S/ {Number(order.total).toFixed(2)}</td>
                   <td className="p-5">
                     <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
                       order.status === 'Pendiente' 
@@ -368,7 +362,7 @@ export default function AdminOrders() {
                     <div className="flex justify-center gap-2">
                       {order.status === 'Pendiente' && (
                         <button 
-                          onClick={() => updateStatus(order.id, 'Entregado')}
+                          onClick={() => updateStatus(order.rawId, 'Entregado')}
                           className="bg-artisan-primary text-white text-[10px] font-bold px-3 py-2 rounded-lg hover:bg-artisan-secondary transition-colors"
                         >
                           MARCAR ENTREGADO

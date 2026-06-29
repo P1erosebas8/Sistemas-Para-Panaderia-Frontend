@@ -60,8 +60,8 @@ export default function UserOrders() {
       message: '¿Deseas finalizar la compra de tu carrito?',
       confirmText: 'Sí, finalizar',
       confirmClass: 'bg-[#8d4b00] hover:bg-[#6e3900] text-white',
-      onConfirm: () => {
-        const result = checkoutCartFlow();
+      onConfirm: async () => {
+        const result = await checkoutCartFlow();
         if (!result.ok) {
           alert(result.message);
           return;
@@ -92,9 +92,9 @@ export default function UserOrders() {
     setConfirmModal((prev) => ({ ...prev, open: false }));
   };
 
-  const handleConfirmModalAction = () => {
+  const handleConfirmModalAction = async () => {
     if (typeof confirmModal.onConfirm === 'function') {
-      confirmModal.onConfirm();
+      await confirmModal.onConfirm();
     }
     closeConfirmModal();
   };

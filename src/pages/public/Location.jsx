@@ -2,42 +2,47 @@
 import { useState, useEffect } from 'react';
 import MapContainer from "../../components/ui/MapContainer";
 import { APIProvider } from '@vis.gl/react-google-maps';
-
-const INITIAL_STORES_DATA = [
-  { id: 1, name: "Briselli - Las Palmeras", address: "Av. Las Palmeras 4099, Los Olivos", coords: { lat: -11.986900008562472, lng: -77.07252834238831 }, status: 'Activo' },
-  { id: 2, name: "Briselli - Antunez de Mayolo", address: "Av. Santiago Antunez de Mayolo 1639, Los Olivos", coords: { lat: -11.996172457316801, lng: -77.08373327552152 }, status: 'Activo' },
-  { id: 3, name: "Briselli - Angélica Gamarra", address: "Av. Angélica Gamarra 1904, Los Olivos", coords: { lat: -12.006227911665578, lng: -77.08198680680607 }, status: 'Activo' },
-  { id: 4, name: "Briselli - Universitaria", address: "Av. Universitaria 6117, Los Olivos 15314", coords: { lat: -11.963674409044833, lng: -77.07214010005937 }, status: 'Activo' },
-  { id: 5, name: "Briselli - Huandoy", address: "Av. A Los Olivos, Cercado de Lima 15306", coords: { lat: -11.963674409044833, lng: -77.07771674666107 }, status: 'Activo' },
-  { id: 6, name: "Briselli - Alfa", address: "Av. Alfa 2171, Los Olivos 15302", coords: { lat: -12.006515670569831, lng: -77.06959673749027 }, status: 'Activo' },
-  { id: 7, name: "Briselli - Mexico", address: "Mexico 488, Comas 15311", coords: { lat: -11.955191527513517, lng: -77.05951937797056 }, status: 'Activo' },
-  { id: 8, name: "Briselli - Tupac", address: "Av. Túpac Amaru 735, Lima 15311", coords: { lat: -11.959675708249497, lng: -77.05402315343272 }, status: 'Activo' },
-  { id: 9, name: "Briselli - German Aguirre", address: "Av. Germán Aguirre 1199, SMP 15103", coords: { lat: -12.019266332865481, lng: -77.0760052178505 }, status: 'Activo' }
-];
+import { branchService } from '../../services/branchService';
 
 export default function LocationPage() {
   const [activeStores, setActiveStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    const saved = localStorage.getItem('briselli_stores');
-    let data;
+    const fetchBranches = async () => {
+      try {
+        const data = await branchService.getAllBranches();
+        const filtered = data.filter(s => s.status === 'Activo' || s.status === 'ACTIVE');
+        // Asegurarse de mapear lat/lng a coords si vienen sueltos en el backend
+        const formatted = filtered.map(b => ({
+          ...b,
+          coords: b.latitude && b.longitude ? { lat: Number(b.latitude), lng: Number(b.longitude) } : (b.coords || { lat: 0, lng: 0 })
+        }));
+        
+        setActiveStores(formatted);
+        if (formatted.length > 0) {
+          setSelectedStore(formatted[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching branches:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (saved) {
-      data = JSON.parse(saved);
-    } else {
-      data = INITIAL_STORES_DATA;
-      localStorage.setItem('briselli_stores', JSON.stringify(INITIAL_STORES_DATA));
-    }
-
-    const filtered = data.filter(s => s.status === 'Activo');
-    setActiveStores(filtered);
-
-    if (filtered.length > 0) {
-      setSelectedStore(filtered[0]);
-    }
+    fetchBranches();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-artisan-neutral">
+        <p className="font-bold text-[#8B572A]">Cargando sedes...</p>
+      </div>
+    );
+  }
 
   if (activeStores.length === 0) {
     return (

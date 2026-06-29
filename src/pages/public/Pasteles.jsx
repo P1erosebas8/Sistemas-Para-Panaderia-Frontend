@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { productService } from "../../services/productService";
 import { addProductToCartFlow } from "../../utils/cartFlow";
 
 export const pasteles = [
@@ -237,10 +238,38 @@ const etiquetaColor = {
 };
 
 export default function Pasteles() {
+  const [pasteles, setPasteles] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [pastelSeleccionado, setPastelSeleccionado] = useState(null);
   const [toastVisible, setToastVisible] = useState(false);
 
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const data = await productService.getAllProducts();
+        const mapped = data.map(p => ({
+          id: p.id,
+          categoria: p.category?.name || "Tortas Clásicas",
+          nombre: p.name,
+          precio: p.price,
+          porciones: "8-10 personas",
+          etiqueta: p.stock < 5 ? "Últimos" : (p.stock > 20 ? "Más Vendido" : null),
+          descripcion: p.description || "Delicioso pastel preparado con amor.",
+          notas: "Receta artesanal",
+          img: p.imageUrl || fallbackImg,
+        }));
+        setPasteles(mapped);
+      } catch (error) {
+        console.error("Error al cargar pasteles:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProductos();
+  }, []);
+
+  
   const showAddToast = () => {
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 1800);
@@ -252,9 +281,18 @@ export default function Pasteles() {
 
   const gruposPorCategoria = Array.from(new Set(pasteles.map(p => p.categoria)));
 
-  const mostrarBento = categoriaActiva === "Todas";
+  const mostrarBento = categoriaActiva === "Todas" && pasteles.length >= 4;
   const itemsBento = pasteles.slice(0, 4);
   const itemsRestantes = mostrarBento ? pasteles.slice(4) : filtrados;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#fbf9f5] flex justify-center items-center">
+        <p className="font-bold text-[#6f4014]">Cargando catálogo...</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen bg-[#fbf9f5] text-[#1b1c1a] font-sans selection:bg-[#ffdcc5] selection:text-[#663100]">
