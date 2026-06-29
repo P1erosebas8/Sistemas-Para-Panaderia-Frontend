@@ -1,0 +1,292 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { getAuthSession } from '../../utils/authSession';
+import { checkoutCartFlow, CART_KEY } from '../../utils/cartFlow';
+
+export default function Checkout() {
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [cartItems, setCartItems] = useState([]);
+  const [user, setUser] = useState(null);
+  
+  // Checkout Info
+  const [shippingInfo, setShippingInfo] = useState({
+    address: '',
+    phone: '',
+    notes: ''
+  });
+  const [paymentData, setPaymentData] = useState({
+    cardNumber: '',
+    expiry: '',
+    cvc: '',
+    name: ''
+  });
+  
+  const [loading, setLoading] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+
+  useEffect(() => {
+    const session = getAuthSession();
+    setUser(session);
+
+    try {
+      const items = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+      setCartItems(items);
+    } catch (error) {
+      console.error(error);
+      setCartItems([]);
+    }
+  }, []);
+
+  const totalAmount = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+  const handleNextStep = () => {
+    if (step === 1 && !user) {
+      alert("Por favor inicia sesión para continuar con la compra.");
+      navigate('/login');
+      return;
+    }
+    setStep(prev => prev + 1);
+  };
+
+  const handleFinalizePurchase = async () => {
+    setLoading(true);
+    // Simulate Culqi Payment Delay
+    await new Promise(r => setTimeout(r, 2000));
+
+    // Actually create the order in Backend
+    const result = await checkoutCartFlow();
+    
+    setLoading(false);
+    
+    if (result.ok) {
+      setOrderId(result.orderId);
+      setStep(4);
+    } else {
+      alert(result.message);
+    }
+  };
+
+  if (cartItems.length === 0 && step !== 4) {
+    return (
+      <div className="min-h-screen bg-[#fbf9f5] pt-24 px-6 flex flex-col items-center justify-center text-center">
+        <h2 className="text-3xl font-black text-[#6f4014] mb-4">Tu carrito está vacío</h2>
+        <p className="text-[#51443b] mb-8">Descubre nuestros deliciosos pasteles y postres.</p>
+        <Link to="/postres" className="px-8 py-3 bg-[#8d4b00] text-white rounded-full font-bold uppercase tracking-widest hover:bg-[#6e3900] transition-colors">
+          Ver Catálogo
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#fbf9f5] font-sans text-[#1b1c1a] pt-24 pb-20">
+      <div className="max-w-4xl mx-auto px-6">
+        
+        {/* Stepper */}
+        <div className="flex justify-between items-center mb-12 relative">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-orange-200 -z-10 rounded-full" />
+          <div className={`absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-[#8d4b00] -z-10 transition-all duration-500 rounded-full`} style={{ width: `${((step - 1) / 3) * 100}%` }} />
+          
+          {['Resumen', 'Envío', 'Pago', 'Confirmación'].map((label, idx) => (
+            <div key={label} className="flex flex-col items-center gap-2">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors ${step >= idx + 1 ? 'bg-[#8d4b00] text-white shadow-lg' : 'bg-white text-orange-300 border-2 border-orange-200'}`}>
+                {idx + 1}
+              </div>
+              <span className={`text-xs font-bold uppercase tracking-widest ${step >= idx + 1 ? 'text-[#8d4b00]' : 'text-orange-300'}`}>{label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Step 1: Summary */}
+        {step === 1 && (
+          <div className="bg-white rounded-3xl p-8 shadow-sm border border-orange-100/50">
+            <h2 className="text-2xl font-black text-[#6f4014] mb-6">Resumen del Carrito</h2>
+            <div className="space-y-4 mb-8">
+              {cartItems.map(item => (
+                <div key={item.id} className="flex items-center gap-4 p-4 bg-orange-50/50 rounded-2xl">
+                  <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-xl shadow-sm" />
+                  <div className="flex-1">
+                    <h3 className="font-bold text-[#6f4014]">{item.name}</h3>
+                    <p className="text-sm text-orange-800/60">Cantidad: {item.quantity}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-black text-[#8d4b00]">S/ {(item.price * item.quantity).toFixed(2)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-between items-center pt-6 border-t border-orange-100">
+              <span className="text-xl font-bold text-[#51443b]">Total a pagar:</span>
+              <span className="text-3xl font-black text-[#8d4b00]">S/ {totalAmount.toFixed(2)}</span>
+            </div>
+            <div className="mt-8 flex justify-end">
+              <button onClick={handleNextStep} className="px-8 py-4 bg-[#8d4b00] text-white rounded-full font-black uppercase tracking-widest hover:bg-[#6e3900] transition-colors shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0">
+                Continuar Compra
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Shipping */}
+        {step === 2 && (
+          <div className="bg-white rounded-3xl p-8 shadow-sm border border-orange-100/50">
+            <h2 className="text-2xl font-black text-[#6f4014] mb-2">Información de Envío</h2>
+            <p className="text-[#51443b] mb-6">Confirma los datos para la entrega de tu pedido.</p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-[#6f4014] mb-2">Nombre del Cliente</label>
+                <input type="text" readOnly value={user?.firstName || user?.email || ''} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed" />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-[#6f4014] mb-2">Dirección de Entrega</label>
+                <input 
+                  type="text" 
+                  value={shippingInfo.address}
+                  onChange={e => setShippingInfo({...shippingInfo, address: e.target.value})}
+                  placeholder="Ej: Av. Los Rosales 123, Surco" 
+                  className="w-full border border-orange-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8d4b00] focus:ring-1 focus:ring-[#8d4b00] transition-colors" 
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-[#6f4014] mb-2">Teléfono de Contacto</label>
+                  <input 
+                    type="text" 
+                    value={shippingInfo.phone}
+                    onChange={e => setShippingInfo({...shippingInfo, phone: e.target.value})}
+                    placeholder="Ej: 987654321" 
+                    className="w-full border border-orange-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8d4b00]" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-[#6f4014] mb-2">Notas Especiales</label>
+                  <input 
+                    type="text" 
+                    value={shippingInfo.notes}
+                    onChange={e => setShippingInfo({...shippingInfo, notes: e.target.value})}
+                    placeholder="Ej: Tocar timbre 2 veces" 
+                    className="w-full border border-orange-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8d4b00]" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-between">
+              <button onClick={() => setStep(1)} className="px-6 py-3 text-[#8d4b00] font-bold hover:bg-orange-50 rounded-full transition-colors">
+                Volver
+              </button>
+              <button onClick={handleNextStep} disabled={!shippingInfo.address || !shippingInfo.phone} className="px-8 py-3 bg-[#8d4b00] text-white rounded-full font-black uppercase tracking-widest hover:bg-[#6e3900] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                Ir al Pago
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Payment */}
+        {step === 3 && (
+          <div className="bg-white rounded-3xl p-8 shadow-sm border border-orange-100/50 max-w-2xl mx-auto">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-black text-[#6f4014] mb-2">Método de Pago</h2>
+              <p className="text-[#51443b]">Estás pagando <span className="font-bold text-[#8d4b00]">S/ {totalAmount.toFixed(2)}</span> de forma segura mediante Culqi.</p>
+            </div>
+            
+            <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 mb-8">
+              <div className="mb-4 flex justify-between items-center">
+                <span className="font-bold text-slate-700">Tarjeta de Crédito / Débito</span>
+                <div className="flex gap-2">
+                  <div className="w-8 h-5 bg-blue-600 rounded flex items-center justify-center text-[8px] font-bold text-white italic">VISA</div>
+                  <div className="w-8 h-5 bg-red-500 rounded flex items-center justify-center text-[8px] font-bold text-white">MC</div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <input 
+                    type="text" 
+                    placeholder="Número de Tarjeta (Mock)" 
+                    value={paymentData.cardNumber}
+                    onChange={e => setPaymentData({...paymentData, cardNumber: e.target.value})}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono" 
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <input 
+                    type="text" 
+                    placeholder="MM/YY" 
+                    value={paymentData.expiry}
+                    onChange={e => setPaymentData({...paymentData, expiry: e.target.value})}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono" 
+                  />
+                  <input 
+                    type="text" 
+                    placeholder="CVC" 
+                    value={paymentData.cvc}
+                    onChange={e => setPaymentData({...paymentData, cvc: e.target.value})}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono" 
+                  />
+                </div>
+                <div>
+                  <input 
+                    type="text" 
+                    placeholder="Nombre en la tarjeta" 
+                    value={paymentData.name}
+                    onChange={e => setPaymentData({...paymentData, name: e.target.value})}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white uppercase" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-between items-center">
+              <button onClick={() => setStep(2)} className="px-6 py-3 text-slate-500 font-bold hover:bg-slate-100 rounded-full transition-colors">
+                Volver
+              </button>
+              <button 
+                onClick={handleFinalizePurchase} 
+                disabled={loading || !paymentData.cardNumber}
+                className="px-8 py-4 bg-emerald-600 text-white rounded-full font-black uppercase tracking-widest hover:bg-emerald-700 transition-colors shadow-lg disabled:opacity-70 flex items-center gap-2"
+              >
+                {loading ? (
+                  <span className="animate-pulse">Procesando...</span>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Pagar Seguro
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Success */}
+        {step === 4 && (
+          <div className="bg-white rounded-3xl p-12 shadow-sm border border-orange-100/50 text-center max-w-lg mx-auto">
+            <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h2 className="text-3xl font-black text-[#6f4014] mb-2">¡Compra Exitosa!</h2>
+            <p className="text-[#51443b] mb-6">Tu pedido ha sido procesado y te hemos enviado un correo con los detalles.</p>
+            
+            <div className="bg-orange-50 p-4 rounded-xl mb-8 inline-block">
+              <span className="text-sm font-bold text-orange-800 uppercase tracking-widest block mb-1">N° de Orden</span>
+              <span className="text-2xl font-black text-[#8d4b00]">#{String(orderId).padStart(5, '0')}</span>
+            </div>
+
+            <div>
+              <Link to="/account/orders" className="block w-full py-4 bg-[#8d4b00] text-white rounded-full font-black uppercase tracking-widest hover:bg-[#6e3900] transition-colors shadow-md mb-3">
+                Ver mis Pedidos
+              </Link>
+              <Link to="/" className="block w-full py-3 text-[#8d4b00] font-bold hover:bg-orange-50 rounded-full transition-colors">
+                Volver a la tienda
+              </Link>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
