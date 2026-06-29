@@ -2,6 +2,19 @@ import { useState, useEffect } from "react";
 import { productService } from "../../services/productService";
 import { addProductToCartFlow } from "../../utils/cartFlow";
 
+const etiquetaColor = {
+  "Más Vendido":     { bg: "#ffdcbd", text: "#6b3800" },
+  "Nuevo":           { bg: "#d1f0d9", text: "#165128" },
+  "Artesanal":       { bg: "#e8d5f5", text: "#5a2d82" },
+  "Tropical":        { bg: "#fff3cd", text: "#7a5500" },
+  "Favorita":        { bg: "#fce4ec", text: "#7b003a" },
+  "Sabor Peruano":   { bg: "#fff8e1", text: "#c84b00" },
+  "Celebración":     { bg: "#ddeeff", text: "#0a3d7a" },
+  "Edición Limitada":{ bg: "#ede7f6", text: "#3e1a7a" },
+  "Temporada":       { bg: "#e8f5e9", text: "#1a5c26" },
+  "Últimos":         { bg: "#ffebee", text: "#b71c1c" }
+};
+
 export default function Pasteles() {
   const [pasteles, setPasteles] = useState([]);
   const categorias = ["Todas", ...Array.from(new Set(pasteles.map(p => p.categoria)))];
