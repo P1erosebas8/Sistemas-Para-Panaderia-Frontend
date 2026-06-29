@@ -26,7 +26,7 @@ const Login = () => {
                 localStorage.setItem('briselli_active_user', JSON.stringify(res));
                 
                 alert(`¡Bienvenido ${res.firstName}!`);
-                if (res.role === 'ADMIN' || res.role === 'admin') {
+                if (res.role === 'ADMIN' || res.role === 'admin' || res.role === 'ROLE_ADMIN') {
                     navigate('/admin');
                 } else {
                     navigate('/postres');
@@ -42,7 +42,7 @@ const Login = () => {
                 localStorage.setItem('briselli_active_user', JSON.stringify(res));
 
                 alert(`Bienvenido ${res.firstName || email}`);
-                if (res.role === 'ADMIN' || res.role === 'admin') {
+                if (res.role === 'ADMIN' || res.role === 'admin' || res.role === 'ROLE_ADMIN') {
                     navigate('/admin');
                 } else {
                     navigate('/postres');

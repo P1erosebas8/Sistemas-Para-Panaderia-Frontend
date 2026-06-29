@@ -14,7 +14,10 @@ api.interceptors.request.use(
     
     // Evitar enviar el token en rutas públicas para prevenir problemas de CORS preflight (OPTIONS)
     const publicEndpoints = ['/products', '/categories', '/branches'];
-    const isPublic = publicEndpoints.some(ep => config.url.includes(ep) && config.method === 'get');
+    const isPublic = publicEndpoints.some(ep => 
+      (config.url || '').includes(ep) && 
+      (config.method || '').toLowerCase() === 'get'
+    );
     
     if (token && !isPublic) {
       config.headers.Authorization = `Bearer ${token}`;
