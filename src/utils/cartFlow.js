@@ -1,4 +1,4 @@
-const CART_KEY = "briselli_cart";
+export const CART_KEY = "briselli_cart";
 const INVENTORY_KEY = "briselli_inventory";
 const ORDERS_KEY = "briselli_orders";
 const AUTH_SESSION_KEY = "briselli_auth_session";
