@@ -24,8 +24,11 @@ export default function Postres() {
     const fetchProductos = async () => {
       try {
         const data = await productService.getAllProducts();
-        // Mapear al modelo que espera la UI
-        const mapped = data.map(p => ({
+        const postresData = data.filter(p => 
+          p.category?.id === 2 || (p.category?.name || '').toLowerCase().includes('postre')
+        );
+
+        const mapped = postresData.map(p => ({
           id: p.id,
           categoria: p.category?.name || "Postres",
           nombre: p.name,

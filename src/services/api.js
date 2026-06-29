@@ -11,7 +11,12 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('briselli_token');
-    if (token) {
+    
+    // Evitar enviar el token en rutas públicas para prevenir problemas de CORS preflight (OPTIONS)
+    const publicEndpoints = ['/products', '/categories', '/branches'];
+    const isPublic = publicEndpoints.some(ep => config.url.includes(ep) && config.method === 'get');
+    
+    if (token && !isPublic) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
