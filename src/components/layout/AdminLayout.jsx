@@ -11,7 +11,8 @@ export default function AdminLayout() {
   useEffect(() => {
     const session = getAuthSession();
 
-    if (!session || session.role !== 'admin') {
+    const role = session?.role?.toUpperCase() || '';
+    if (!session || !role.includes('ADMIN')) {
       console.error("Acceso no autorizado");
       navigate('/login', { replace: true });
     } else {
