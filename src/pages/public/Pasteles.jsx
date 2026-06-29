@@ -13,10 +13,7 @@ export default function Pasteles() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const data = await productService.getAllProducts();
-        const pastelesData = data.filter(p => 
-          (p.categoryName || '').toLowerCase().includes('pastel')
-        );
+        const pastelesData = await productService.getProductsByCategory(1);
 
         const mapped = pastelesData.map(p => ({
           id: p.id,

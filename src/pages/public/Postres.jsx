@@ -23,10 +23,7 @@ export default function Postres() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const data = await productService.getAllProducts();
-        const postresData = data.filter(p => 
-          (p.categoryName || '').toLowerCase().includes('postre')
-        );
+        const postresData = await productService.getProductsByCategory(2);
 
         const mapped = postresData.map(p => ({
           id: p.id,
