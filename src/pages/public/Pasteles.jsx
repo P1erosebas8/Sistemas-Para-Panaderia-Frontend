@@ -15,12 +15,12 @@ export default function Pasteles() {
       try {
         const data = await productService.getAllProducts();
         const pastelesData = data.filter(p => 
-          p.category?.id === 1 || (p.category?.name || '').toLowerCase().includes('pastel')
+          (p.categoryName || '').toLowerCase().includes('pastel')
         );
 
         const mapped = pastelesData.map(p => ({
           id: p.id,
-          categoria: p.category?.name || "Pasteles",
+          categoria: p.categoryName || "Pasteles",
           nombre: p.name,
           precio: p.price,
           porciones: "8-10 personas",

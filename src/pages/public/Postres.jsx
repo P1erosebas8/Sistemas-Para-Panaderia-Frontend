@@ -25,12 +25,12 @@ export default function Postres() {
       try {
         const data = await productService.getAllProducts();
         const postresData = data.filter(p => 
-          p.category?.id === 2 || (p.category?.name || '').toLowerCase().includes('postre')
+          (p.categoryName || '').toLowerCase().includes('postre')
         );
 
         const mapped = postresData.map(p => ({
           id: p.id,
-          categoria: p.category?.name || "Postres",
+          categoria: p.categoryName || "Postres",
           nombre: p.name,
           precio: p.price,
           porciones: "1 porción",
