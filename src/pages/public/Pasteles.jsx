@@ -2,243 +2,9 @@ import { useState, useEffect } from "react";
 import { productService } from "../../services/productService";
 import { addProductToCartFlow } from "../../utils/cartFlow";
 
-export const pasteles = [
-  // ── TORTAS CLÁSICAS ──────────────────────────────────────────────
-  {
-    id: 1,
-    categoria: "Tortas Clásicas",
-    nombre: "Torta Negra de Chocolate",
-    precio: 115,
-    porciones: "8–10 personas",
-    etiqueta: "Más Vendido",
-    descripcion: "Tres generosas capas de bizcocho húmedo elaborado con cacao 70% de origen, separadas por ganache de chocolate amargo y cubiertas con buttercream de vainilla de Madagascar. Intensa y elegante.",
-    notas: "Cacao intenso, avellana, vainilla",
-    img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 2,
-    categoria: "Tortas Clásicas",
-    nombre: "Red Velvet con Cream Cheese",
-    precio: 105,
-    porciones: "8–10 personas",
-    etiqueta: null,
-    descripcion: "Suaves capas carmesí de bizcocho de cacao con un toque de buttermilk, intercaladas con frosting sedoso de queso crema Philadelphia y vainilla real. Un clásico sureño que nunca decepciona.",
-    notas: "Cacao suave, queso crema, vainilla",
-    img: "https://images.unsplash.com/photo-1586788680434-30d324b2d46f?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 3,
-    categoria: "Tortas Clásicas",
-    nombre: "Torta de Zanahoria y Nuez",
-    precio: 92,
-    porciones: "8–10 personas",
-    etiqueta: null,
-    descripcion: "Bizcocho jugoso aromatizado con canela de Ceilán, nuez moscada y jengibre, repleto de zanahoria rallada y nueces pecanas tostadas. Cubierto con generoso frosting de queso crema.",
-    notas: "Canela, jengibre, queso crema",
-    img: "https://images.unsplash.com/photo-1621303837174-89787a7d4729?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 4,
-    categoria: "Tortas Clásicas",
-    nombre: "Selva Negra",
-    precio: 98,
-    porciones: "8–10 personas",
-    etiqueta: "Nuevo",
-    descripcion: "El clásico alemán: capas de bizcocho de chocolate empapadas en kirsch, rellenas de Chantilly fresca y cerezas Amarena importadas, decoradas con virutas de chocolate negro.",
-    notas: "Cereza, chocolate amargo, kirsch",
-    img: "https://images.unsplash.com/photo-1606890737304-57a1ca8a5b62?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 5,
-    categoria: "Tortas Clásicas",
-    nombre: "Torta de Vainilla y Fresas",
-    precio: 88,
-    porciones: "8–10 personas",
-    etiqueta: null,
-    descripcion: "Delicado bizcocho génoise de vainilla de Tahití con relleno de crema diplomática y fresas frescas de temporada. Cubierta con merengue italiano y decoración de frutas naturales.",
-    notas: "Vainilla Tahití, fresa fresca, crema",
-    img: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 6,
-    categoria: "Tortas Clásicas",
-    nombre: "Pastel Ópera",
-    precio: 125,
-    porciones: "10–12 personas",
-    etiqueta: "Artesanal",
-    descripcion: "El símbolo de la repostería francesa: capas alternas de bizcocho Joconde de almendra empapado en espresso, buttercream de café Arabica y ganache de chocolate 66%.",
-    notas: "Café Arabica, almendra, chocolate negro",
-    img: "https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 7,
-    categoria: "Tortas Clásicas",
-    nombre: "Torta de Tres Leches",
-    precio: 88,
-    porciones: "10–12 personas",
-    etiqueta: "Favorita",
-    descripcion: "Bizcocho esponjoso empapado en mezcla de leche evaporada, leche condensada y crema de leche. Coronado con merengue suizo tostado y canela en polvo.",
-    notas: "Tres leches, merengue, canela",
-    img: "https://images.unsplash.com/photo-1673974798330-23e8f4c9ae05?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-  },
-  {
-    id: 8,
-    categoria: "Tortas Clásicas",
-    nombre: "Chiffon de Limón",
-    precio: 82,
-    porciones: "8–10 personas",
-    etiqueta: null,
-    descripcion: "Bizcocho extraordinariamente etéreo elaborado con claras montadas a punto de nieve y ralladura de limón. Glaseado con lemon curd brillante y Chantilly de limón.",
-    notas: "Limón, vainilla, textura aerada",
-    img: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&q=80&w=800",
-  },
-
-  // ── TARTAS Y PASTELES FINOS ───────────────────────────────────────
-  {
-    id: 9,
-    categoria: "Tartas y Pasteles Finos",
-    nombre: "Tarta de Frutas del Bosque",
-    precio: 95,
-    porciones: "6–8 personas",
-    etiqueta: "Nuevo",
-    descripcion: "Base sablée bretona crujiente, crema pastelera de vainilla de Madagascar y corona de moras, frambuesas y arándanos frescos. Acabado con nappage brillante.",
-    notas: "Frutos rojos, vainilla, mantequilla",
-    img: "https://images.unsplash.com/photo-1464305795204-6f5bbfc7fb81?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 10,
-    categoria: "Tartas y Pasteles Finos",
-    nombre: "Cheesecake New York",
-    precio: 98,
-    porciones: "8–10 personas",
-    etiqueta: "Más Vendido",
-    descripcion: "Auténtico estilo Nueva York: base de galleta Graham, relleno denso y cremoso de queso crema Philadelphia y vainilla. Horneado a baño maría.",
-    notas: "Queso crema, vainilla, limón",
-    img: "https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 11,
-    categoria: "Tartas y Pasteles Finos",
-    nombre: "Tarta de Limón y Merengue",
-    precio: 78,
-    porciones: "6–8 personas",
-    etiqueta: null,
-    descripcion: "Base sablée, lemon curd intenso preparado con limones de Sicilia, recubierto de generoso merengue italiano tostado al soplete. Equilibrio entre acidez y dulzor.",
-    notas: "Limón Sicilia, merengue italiano, mantequilla",
-    img: "https://www.splenda.com/wp-content/uploads/2020/05/lemon-meringue-pie-scaled.jpg",
-  },
-  {
-    id: 12,
-    categoria: "Tartas y Pasteles Finos",
-    nombre: "Tarta de Chocolate y Caramelo",
-    precio: 88,
-    porciones: "6–8 personas",
-    etiqueta: null,
-    descripcion: "Masa quebrada de cacao, ganache de chocolate 72% y capa de caramelo salado hecho con mantequilla de Normandía. Finalizada con flor de sal marina.",
-    notas: "Chocolate 72%, caramelo, flor de sal",
-    img: "https://images.unsplash.com/photo-1481391243133-f96216dcb5d2?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 13,
-    categoria: "Tartas y Pasteles Finos",
-    nombre: "Tiramisú Clásico",
-    precio: 82,
-    porciones: "8–10 personas",
-    etiqueta: null,
-    descripcion: "Receta italiana auténtica: savoiardi empapados en espresso doble, capas de crema de mascarpone con marsala seco y cacao puro de Holanda.",
-    notas: "Espresso, mascarpone, cacao Holanda",
-    img: "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&q=80&w=800",
-  },
-
-  // ── PASTELERÍA INDIVIDUAL ─────────────────────────────────────────
-  {
-    id: 17,
-    categoria: "Pastelería Individual",
-    nombre: "Éclair de Chocolate",
-    precio: 18,
-    porciones: "1 unidad",
-    etiqueta: null,
-    descripcion: "Masa choux aireada y crujiente, rellena de crema pastelera de chocolate amargo infusionada con espresso y cubierta con glasé brillante de chocolate negro.",
-    notas: "Chocolate, café, crema pastelera",
-    img: "https://images.aws.nestle.recipes/resized/69acec9dbef59c252adb76fc126c58df_eclairs-de-chocolate-negro-70-_1290_742.jpg",
-  },
-  {
-    id: 18,
-    categoria: "Pastelería Individual",
-    nombre: "Croissant de Mantequilla",
-    precio: 15,
-    porciones: "1 unidad",
-    etiqueta: null,
-    descripcion: "81 capas de hojaldre laminado con mantequilla de Normandía. Fermentado en frío por 48 horas para desarrollar aroma. Dorado y crujiente.",
-    notas: "Mantequilla Normandía, trigo, levadura",
-    img: "https://images.unsplash.com/photo-1623334044303-241021148842?auto=format&fit=crop&q=80&w=800",
-  },
-
-  // ── TORTAS ESPECIALES ─────────────────────────────────────────────
-  {
-    id: 27,
-    categoria: "Tortas Especiales",
-    nombre: "Torta de Lúcuma y Manjar",
-    precio: 105,
-    porciones: "8–10 personas",
-    etiqueta: "Sabor Peruano",
-    descripcion: "Capas de bizcocho de lúcuma fresca, rellenas con manjar blanco artesanal de Cajamarca y cubiertas con ganache de chocolate de leche con polvo de lúcuma.",
-    notas: "Lúcuma, manjar blanco, chocolate leche",
-    img: "https://cdnx.jumpseller.com/pasteleria-francesa1/image/25951729/PAsteleria_julio2022-6.jpg?1659047919",
-  },
-  {
-    id: 28,
-    categoria: "Tortas Especiales",
-    nombre: "Drip Cake de Vainilla",
-    precio: 135,
-    porciones: "12–15 personas",
-    etiqueta: "Celebración",
-    descripcion: "Espectacular torta de celebración: cuatro capas de bizcocho de vainilla con buttercream, cobertura de ganache blanca y efecto drip de chocolate negro.",
-    notas: "Vainilla, buttercream, ganache blanca",
-    img: "https://images.unsplash.com/photo-1535254973040-607b474cb50d?auto=format&fit=crop&q=80&w=800",
-  },
-
-  // ── POSTRES DE TEMPORADA ──────────────────────────────────────────
-  {
-    id: 38,
-    categoria: "Temporada",
-    nombre: "Pavlova Tropical",
-    precio: 95,
-    porciones: "8–10 personas",
-    etiqueta: "Temporada",
-    descripcion: "Merengue crujiente por fuera y suave por dentro. Coronado con Chantilly y una explosión de frutas tropicales frescas: mango, maracuyá y kiwi.",
-    notas: "Merengue, Chantilly, frutas tropicales",
-    img: "https://images.unsplash.com/photo-1550617931-e17a7b70dce2?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    id: 40,
-    categoria: "Temporada",
-    nombre: "Tronco Navideño",
-    precio: 145,
-    porciones: "10–12 personas",
-    etiqueta: "Edición Limitada",
-    descripcion: "Bizcocho suizo de chocolate enrollado con mousse de castañas y ganache de chocolate negro, cubierto con textura de corteza nevada.",
-    notas: "Castañas, chocolate negro, merengue",
-    img: "https://i.ytimg.com/vi/peYSZayrP7c/maxresdefault.jpg",
-  },
-];
-
-const categorias = ["Todas", ...Array.from(new Set(pasteles.map(p => p.categoria)))];
-
-const etiquetaColor = {
-  "Más Vendido":     { bg: "#ffdcbd", text: "#6b3800" },
-  "Nuevo":           { bg: "#d1f0d9", text: "#165128" },
-  "Artesanal":       { bg: "#e8d5f5", text: "#5a2d82" },
-  "Tropical":        { bg: "#fff3cd", text: "#7a5500" },
-  "Favorita":        { bg: "#fce4ec", text: "#7b003a" },
-  "Sabor Peruano":   { bg: "#fff8e1", text: "#c84b00" },
-  "Celebración":     { bg: "#ddeeff", text: "#0a3d7a" },
-  "Edición Limitada":{ bg: "#ede7f6", text: "#3e1a7a" },
-  "Temporada":       { bg: "#e8f5e9", text: "#1a5c26" },
-};
-
 export default function Pasteles() {
   const [pasteles, setPasteles] = useState([]);
+  const categorias = ["Todas", ...Array.from(new Set(pasteles.map(p => p.categoria)))];
   const [loading, setLoading] = useState(true);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [pastelSeleccionado, setPastelSeleccionado] = useState(null);
@@ -248,16 +14,20 @@ export default function Pasteles() {
     const fetchProductos = async () => {
       try {
         const data = await productService.getAllProducts();
-        const mapped = data.map(p => ({
+        const pastelesData = data.filter(p => 
+          p.category?.id === 1 || (p.category?.name || '').toLowerCase().includes('pastel')
+        );
+
+        const mapped = pastelesData.map(p => ({
           id: p.id,
-          categoria: p.category?.name || "Tortas Clásicas",
+          categoria: p.category?.name || "Pasteles",
           nombre: p.name,
           precio: p.price,
           porciones: "8-10 personas",
           etiqueta: p.stock < 5 ? "Últimos" : (p.stock > 20 ? "Más Vendido" : null),
-          descripcion: p.description || "Delicioso pastel preparado con amor.",
-          notas: "Receta artesanal",
-          img: p.imageUrl || fallbackImg,
+          descripcion: p.description || "Delicioso pastel preparado con ingredientes selectos.",
+          notas: "Receta de la casa",
+          img: p.imageUrl || "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800",
         }));
         setPasteles(mapped);
       } catch (error) {
