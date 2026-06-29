@@ -62,7 +62,7 @@ export default function AdminDashboard() {
         const value = productsData.reduce((acc, p) => acc + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
         
         const categories = productsData.reduce((acc, p) => {
-          const normalized = normalizeCategory(p.category?.name);
+          const normalized = normalizeCategory(p.categoryName);
           acc[normalized] = (acc[normalized] || 0) + 1;
           return acc;
         }, { Pasteles: 0, Panes: 0, Postres: 0 });
