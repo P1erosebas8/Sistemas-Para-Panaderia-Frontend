@@ -15,6 +15,7 @@ import UserProfile from './pages/user/Profile'
 import UserOrders from './pages/user/OrdersU'
 import PastelesPage from './pages/public/Pasteles';
 import Postres from './pages/public/Postres';
+import Checkout from './pages/public/Checkout';
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +30,7 @@ function App() {
           <Route path="ubicanos" element={<LocationPage />} />
           <Route path="pasteles" element={<PastelesPage />} />
           <Route path="postres" element={<Postres />} />
+          <Route path="checkout" element={<Checkout />} />
           <Route path="account" element={<UserLayout />}>
 
             <Route index element={<UserProfile />} />

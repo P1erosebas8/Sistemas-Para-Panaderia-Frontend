@@ -121,9 +121,9 @@ export default function Navbar() {
 
         {/* DERECHA */}
         <div className="flex items-center gap-4">
-          {user?.role?.toLowerCase() === 'user' && (
+          {(!user || user?.role?.toUpperCase() === 'COMPRADOR' || user?.role?.toUpperCase() === 'ROLE_COMPRADOR') && (
             <NavLink
-              to="/account/orders"
+              to="/checkout"
               className={({ isActive }) =>
                 `relative ml-2 p-2.5 rounded-full border transition-all ${
                   isActive
