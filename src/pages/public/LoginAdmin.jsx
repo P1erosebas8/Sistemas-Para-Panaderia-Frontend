@@ -1,93 +1,69 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setAuthSession } from '../../utils/authSession';
+import { authService } from '../../services/authService';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
+    const [showOtp, setShowOtp] = useState(false);
+    const [otp, setOtp] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const DEFAULT_USER = {
-        id: 'user-01',
-        firstName: 'Piero',
-        lastName: 'Molina',
-        email: 'pieromolina@briselli.com',
-        password: 'admin123',
-        role: 'user',
-        status: 'Activo'
-    };
-    const DEFAULT_ADMIN = {
-        id: 'master-01',
-        firstName: 'Piero',
-        lastName: 'Bellido',
-        email: 'piero@briselli.com',
-        password: 'admin123',
-        role: 'admin',
-        status: 'Activo'
-    };
-
-    const handleAuth = (e) => {
+    const handleAuth = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
-        const storedUsers = JSON.parse(localStorage.getItem('briselli_users')) || [];
-        const allUsers = [...storedUsers];
-        const defaultUserExists = allUsers.find(u => u.email === DEFAULT_USER.email);
-        const defaultAdminExists = allUsers.find(u => u.email === DEFAULT_ADMIN.email);
-        if (!defaultUserExists) allUsers.push(DEFAULT_USER);
-        if (!defaultAdminExists) allUsers.push(DEFAULT_ADMIN);
-
-        if (isLogin) {
-            const userFound = allUsers.find(u =>
-                u.email.toLowerCase() === email.toLowerCase() &&
-                u.password === password
-            );
-
-            if (userFound) {
-                setAuthSession(userFound);
-                localStorage.setItem('briselli_active_user', JSON.stringify(userFound));
-
-                if (!defaultUserExists || !defaultAdminExists) {
-                    localStorage.setItem('briselli_users', JSON.stringify(allUsers));
+        try {
+            if (showOtp) {
+                // Verificar OTP
+                const res = await authService.verifyOtp({ email, otp });
+                setAuthSession(res);
+                localStorage.setItem('briselli_token', res.token);
+                localStorage.setItem('briselli_active_user', JSON.stringify(res));
+                
+                alert(`¡Bienvenido ${res.firstName}!`);
+                if (res.role === 'ADMIN' || res.role === 'admin') {
+                    navigate('/admin');
+                } else {
+                    navigate('/postres');
                 }
+                return;
+            }
 
-                const fullName = `${userFound.firstName || ''} ${userFound.lastName || ''}`.trim() || userFound.email;
-                alert(`Bienvenido ${fullName}`);
-                if (userFound.role?.toLowerCase() === 'admin') {
+            if (isLogin) {
+                const res = await authService.login({ email, password });
+                
+                setAuthSession(res);
+                localStorage.setItem('briselli_token', res.token);
+                localStorage.setItem('briselli_active_user', JSON.stringify(res));
+
+                alert(`Bienvenido ${res.firstName || email}`);
+                if (res.role === 'ADMIN' || res.role === 'admin') {
                     navigate('/admin');
                 } else {
                     navigate('/postres');
                 }
             } else {
-                alert("Correo o contraseña incorrectos.");
+                // Registro
+                const res = await authService.register({
+                    firstName: name,
+                    email,
+                    password
+                });
+                
+                alert(res || "Registro exitoso. Revisa tu correo electrónico para obtener tu código OTP.");
+                setShowOtp(true);
             }
-        } else {
-            // --- LÓGICA DE REGISTRO ---
-            if (allUsers.find(u => u.email.toLowerCase() === email.toLowerCase())) {
-                return alert("Este correo ya está registrado.");
-            }
-
-            const newUser = {
-                firstName: name,
-                lastName: '',
-                email: email,
-                password: password,
-                role: 'user',
-                dni: '',
-                phone: '',
-                address: '',
-                status: 'Activo'
-            };
-
-            const updatedUsers = [...storedUsers, newUser];
-            localStorage.setItem('briselli_users', JSON.stringify(updatedUsers));
-            localStorage.setItem('briselli_active_user', JSON.stringify(newUser));
-            setAuthSession(newUser);
-
-            const fullName = `${newUser.firstName || ''} ${newUser.lastName || ''}`.trim() || newUser.email;
-            alert(`Bienvenido ${fullName}`);
-            navigate('/postres');
+        } catch (error) {
+            console.error(error);
+            const msg = error.response?.data?.message || error.response?.data || "Ocurrió un error. Verifica tus credenciales.";
+            alert(typeof msg === 'string' ? msg : "Error en la autenticación");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -117,7 +93,25 @@ const Login = () => {
                     </div>
 
                     <form onSubmit={handleAuth} className="w-full space-y-4">
-                        {!isLogin && (
+                        {showOtp ? (
+                            <div className="space-y-1.5">
+                                <p className="text-xs text-center text-gray-600 mb-4">
+                                    Hemos enviado un código a <b>{email}</b>. Por favor, ingrésalo para verificar tu cuenta.
+                                </p>
+                                <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Código OTP</label>
+                                <input
+                                    required
+                                    type="text"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    className="w-full h-12 px-5 bg-gray-50 border-2 border-gray-100 focus:border-[#8d4b00] focus:bg-white rounded-2xl text-sm transition-all outline-none"
+                                    placeholder="123456"
+                                    maxLength={6}
+                                />
+                            </div>
+                        ) : (
+                            <>
+                                {!isLogin && (
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Nombre Completo</label>
                                 <input
@@ -155,20 +149,26 @@ const Login = () => {
                             />
                         </div>
 
+                            </>
+                        )}
+
                         <button
                             type="submit"
-                            className="w-full h-12 bg-[#8d4b00] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg shadow-orange-900/20 hover:bg-[#6e3900] active:scale-[0.98] transition-all mt-4"
+                            disabled={loading}
+                            className="w-full h-12 bg-[#8d4b00] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg shadow-orange-900/20 hover:bg-[#6e3900] active:scale-[0.98] transition-all mt-4 disabled:opacity-50"
                         >
-                            {isLogin ? 'Entrar' : 'Crear Cuenta'}
+                            {loading ? 'Cargando...' : showOtp ? 'Verificar' : isLogin ? 'Entrar' : 'Crear Cuenta'}
                         </button>
                     </form>
 
-                    <button
-                        onClick={() => setIsLogin(!isLogin)}
-                        className="mt-6 text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter"
-                    >
-                        {isLogin ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión'}
-                    </button>
+                    {!showOtp && (
+                        <button
+                            onClick={() => setIsLogin(!isLogin)}
+                            className="mt-6 text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter"
+                        >
+                            {isLogin ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión'}
+                        </button>
+                    )}
                 </div>
             </main>
         </div>

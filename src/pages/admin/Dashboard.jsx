@@ -1,5 +1,9 @@
 // src/pages/admin/Dashboard.jsx
 import { useState, useEffect } from 'react';
+import { analyticsService } from '../../services/analyticsService';
+import { productService } from '../../services/productService';
+import { branchService } from '../../services/branchService';
+import { orderService } from '../../services/orderService';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -32,54 +36,59 @@ export default function AdminDashboard() {
       );
     };
 
-    const loadDashboardData = () => {
-      const savedInventory = JSON.parse(localStorage.getItem('briselli_inventory') || '[]');
-      const savedUsers = JSON.parse(localStorage.getItem('briselli_users') || '[]');
-      const savedStores = JSON.parse(localStorage.getItem('briselli_stores') || '[]');
-      const savedOrders = JSON.parse(localStorage.getItem('briselli_orders') || '[]');
+    const loadDashboardData = async () => {
+      try {
+        const [
+          salesData,
+          lowStockData,
+          productsData,
+          branchesData,
+          ordersData
+        ] = await Promise.all([
+          analyticsService.getSales().catch(() => ({ total: 0 })),
+          analyticsService.getLowStock().catch(() => []),
+          productService.getAllProductsAdmin().catch(() => []),
+          branchService.getAllBranchesAdmin().catch(() => []),
+          orderService.getAllOrdersAdmin().catch(() => [])
+        ]);
 
-      const activeUsers = savedUsers.filter(u => u.status === 'Activo').length;
-      const activeS = savedStores.filter(s => s.status === 'Activo').length;
-      const inactiveS = savedStores.length - activeS;
+        // Mock users since there is no admin users endpoint yet
+        const savedUsers = JSON.parse(localStorage.getItem('briselli_users') || '[]');
+        const activeUsers = savedUsers.filter(u => u.status === 'Activo').length || 1;
 
-      const value = savedInventory.reduce((acc, p) => acc + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
-      const lowStock = savedInventory.filter(p => (Number(p.stock) || 0) < 5).length;
-      const categories = savedInventory.reduce((acc, p) => {
-        const normalized = normalizeCategory(p.category);
-        acc[normalized] = (acc[normalized] || 0) + 1;
-        return acc;
-      }, { Pasteles: 0, Panes: 0, Postres: 0 });
+        const activeS = branchesData.filter(s => String(s.status || '').toUpperCase() === 'ACTIVO' || String(s.status || '').toUpperCase() === 'ACTIVE').length;
+        const inactiveS = branchesData.length - activeS;
 
-      const todaySales = savedOrders
-        .filter((order) => isToday(order.date))
-        .reduce((acc, order) => acc + (Number(order.total) || 0), 0);
+        const value = productsData.reduce((acc, p) => acc + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
+        
+        const categories = productsData.reduce((acc, p) => {
+          const normalized = normalizeCategory(p.category?.name);
+          acc[normalized] = (acc[normalized] || 0) + 1;
+          return acc;
+        }, { Pasteles: 0, Panes: 0, Postres: 0 });
 
-      const pendingOrders = savedOrders.filter(
-        (order) => String(order.status || '').toLowerCase() === 'pendiente'
-      ).length;
+        const todaySales = salesData.total || 0;
 
-      setStats({
-        totalProducts: savedInventory.length,
-        inventoryValue: value,
-        lowStockCount: lowStock,
-        activeStaff: activeUsers,
-        pendingOrders,
-        totalSalesDay: todaySales,
-        byCategory: categories,
-        storesInfo: { active: activeS, inactive: inactiveS, total: savedStores.length }
-      });
-    };
+        const pendingOrders = ordersData.filter(
+          (order) => String(order.status || '').toLowerCase() === 'pendiente' || String(order.status || '').toLowerCase() === 'pending'
+        ).length;
 
-    const onStorage = (event) => {
-      const keys = ['briselli_inventory', 'briselli_orders', 'briselli_users', 'briselli_stores'];
-      if (!event.key || keys.includes(event.key)) {
-        loadDashboardData();
+        setStats({
+          totalProducts: productsData.length,
+          inventoryValue: value,
+          lowStockCount: lowStockData.length,
+          activeStaff: activeUsers,
+          pendingOrders,
+          totalSalesDay: todaySales,
+          byCategory: categories,
+          storesInfo: { active: activeS, inactive: inactiveS, total: branchesData.length }
+        });
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
       }
     };
 
     loadDashboardData();
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   return (

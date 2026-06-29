@@ -1,5 +1,7 @@
 const SESSION_KEY = "briselli_auth_session";
 const LEGACY_KEY = "briselli_auth";
+const ACTIVE_USER_KEY = "briselli_active_user";
+const TOKEN_KEY = "briselli_token";
 
 export function getAuthSession() {
   try {
@@ -10,8 +12,8 @@ export function getAuthSession() {
   }
 
   try {
-    const legacyValue = localStorage.getItem(LEGACY_KEY);
-    if (legacyValue) return JSON.parse(legacyValue);
+    const activeValue = localStorage.getItem(ACTIVE_USER_KEY);
+    if (activeValue) return JSON.parse(activeValue);
   } catch {
     // ignore
   }
@@ -26,4 +28,6 @@ export function setAuthSession(user) {
 export function clearAuthSession() {
   sessionStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(LEGACY_KEY);
+  localStorage.removeItem(ACTIVE_USER_KEY);
+  localStorage.removeItem(TOKEN_KEY);
 }

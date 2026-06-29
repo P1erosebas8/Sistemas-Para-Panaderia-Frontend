@@ -1,109 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { addProductToCartFlow } from "../../utils/cartFlow";
+import { productService } from "../../services/productService";
 
-const postres = [
-  {
-    id: 1,
-    categoria: "Postres Individuales",
-    nombre: "Cheesecake de Fresa",
-    precio: 18,
-    porciones: "1 porción",
-    etiqueta: "Popular",
-    descripcion: "Suave cheesecake con base de galleta, cubierto con fresas frescas, glaseado de fresa y un delicado toque de crema chantilly.",
-    notas: "Queso crema, fresa fresca, chantilly",
-    img: "https://scontent-lim1-1.xx.fbcdn.net/v/t39.30808-6/649514282_1541653711294103_4120625557878409919_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=7b2446&_nc_ohc=_8jOzcR3vgIQ7kNvwHIVVAG&_nc_oc=AdrWo1xfl3Q5_JewGEuMbPTlHdaCjD_5l9G5DVBwQ4edURxCXz9CROrM82GK-gNq334&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=E4MCiHLmRAERrrxdhAldEA&_nc_ss=7b2a8&oh=00_Af09nRaFM49k2n-zjor0Rrn_Q5Rp4KX9zLgLsAF0IjoYJQ&oe=69F85025",
-    ingredientes: "Queso crema, fresas frescas, galleta, mantequilla, azúcar, crema chantilly, glaseado de fresa.",
-    informacion: "Textura cremosa, sabor fresco y equilibrado, ideal para los amantes de las frutas.",
-  },
-  {
-    id: 2,
-    categoria: "Postres Individuales",
-    nombre: "Rolls con Chips de Chocolate",
-    precio: 12.50,
-    porciones: "1 unidad",
-    etiqueta: null,
-    descripcion: "Rolls de canela cubiertos con glaseado y decorados con deliciosos chips de chocolate.",
-    notas: "Canela, chips de chocolate, glaseado vainilla",
-    img: "https://scontent-lim1-1.xx.fbcdn.net/v/t39.30808-6/619120779_1502410635218411_5840259771253580548_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=7b2446&_nc_ohc=iCGWY-GxdTgQ7kNvwEPSvtX&_nc_oc=AdqamdPq6YbjhSQA2ac_UXVJznE5q8OM4oAPOJtvlbEzv70xumipEr00X-sgYnFQpIs&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=jVSyogjv1T5BklxJq-MIWw&_nc_ss=7b2a8&oh=00_Af2aCZS8CjGhsxNpcv_Umt7SAfjYhYT5qwEftIjjxwUPxA&oe=69F8401B",
-    ingredientes: "Harina, mantequilla, azúcar, canela, levadura, leche, huevos, glaseado de vainilla, chips de chocolate.",
-    informacion: "Masa suave y aromática, con un equilibrio perfecto entre dulzura y sabor especiado.",
-  },
-  {
-    id: 3,
-    categoria: "Postres Individuales",
-    nombre: "Cañitas de Manjar",
-    precio: 9.50,
-    porciones: "1 unidad",
-    etiqueta: null,
-    descripcion: "Crujientes rollitos de hojaldre rellenos con abundante manjar blanco y espolvoreados con azúcar en polvo.",
-    notas: "Hojaldre, manjar blanco, azúcar en polvo",
-    img: "https://scontent-lim1-1.xx.fbcdn.net/v/t39.30808-6/619285440_1502410648551743_8807975528775788450_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=7b2446&_nc_ohc=BGjAkktAXvsQ7kNvwFCGWu9&_nc_oc=Ado7aSBBlRyaH22xdK-Nei5Ddlwh5RW_TmHoYYhGYRdENJuQPeuBonqddOaxTo2u8XE&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=k5NJJOhEvHmONODEZ2kMwA&_nc_ss=7b2a8&oh=00_Af1-FtLPcoHQuIYZPNAvRZ2UvfnuIRV_UT54ceqVuhg8RQ&oe=69F84A7C",
-    ingredientes: "Harina, mantequilla, huevos, manjar blanco, azúcar en polvo.",
-    informacion: "Exterior crocante, relleno cremoso y dulce, una clásica delicia tradicional.",
-  },
+const fallbackImg = "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&q=80&w=800";
 
-  // ── GALLETAS Y BOCADOS ────────────────────────────────────────────
-  {
-    id: 4,
-    categoria: "Galletas y Bocados",
-    nombre: "Galletas de Mantequilla con Guinda",
-    precio: 11,
-    porciones: "1 unidad",
-    etiqueta: "Nuevo",
-    descripcion: "Delicadas galletas de mantequilla, suaves y aromáticas, decoradas con una dulce guinda en el centro.",
-    notas: "Mantequilla, vainilla, guinda",
-    img: "https://scontent-lim1-1.xx.fbcdn.net/v/t39.30808-6/608849094_1484520380340770_5071488719152032345_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=7b2446&_nc_ohc=N2JFv69e8n4Q7kNvwH4T-yc&_nc_oc=Ado6Zfl5RVB49xB4KpPOtBNbqbENpA3NvRzvI7VGvO5v8bFQCCxMd4xYEj_OfjOnOH8&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=WB8EOZ4TbWS2Bw35HvsAPw&_nc_ss=7b2a8&oh=00_Af1tcx-GzeuRZqEMXf1XcoYL608S7DrGIQO9eunwBrBoYA&oe=69F84D1D",
-    ingredientes: "Harina, mantequilla, azúcar, huevos, esencia de vainilla, guinda.",
-    informacion: "Textura suave y ligeramente crujiente, con un sabor clásico y elegante.",
-  },
-
-  // ── POSTRES EN VASO ───────────────────────────────────────────────
-  {
-    id: 5,
-    categoria: "Postres en Vaso",
-    nombre: "Vasos de Postre Surtidos",
-    precio: 7,
-    porciones: "1 porción",
-    etiqueta: null,
-    descripcion: "Deliciosos postres en vaso con capas de crema, chocolate, gelatina y frutas, ideales para disfrutar en porciones individuales.",
-    notas: "Crema pastelera, chocolate, frutas frescas",
-    img: "https://scontent-lim1-1.xx.fbcdn.net/v/t39.30808-6/492756468_1254704973322313_5267312312456129657_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7b2446&_nc_ohc=Pao4VrQOPCYQ7kNvwEqqGd3&_nc_oc=Adon_MobBW7RHiIKIwylmqWEf6FG-QcwvtW3ksIBxyEZQRC7RRDtaGTQPiCrjNOk8LE&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=IZ1lXnN4Fiv_GL7AseJ9Ww&_nc_ss=7b2a8&oh=00_Af0lqrosY1vJljMjofSevK7YOW8KQytWVLIJ5RWQoCMntw&oe=69F83DCC",
-    ingredientes: "Crema pastelera, chocolate, gelatina, frutas (fresa o cereza), bizcocho o galleta triturada, azúcar, crema chantilly.",
-    informacion: "Variedad de sabores y texturas en un solo formato práctico. Perfectos para antojos rápidos o eventos.",
-  },
-  {
-    id: 6,
-    categoria: "Postres en Vaso",
-    nombre: "Copas de Crema y Gelatina",
-    precio: 13,
-    porciones: "1 porción",
-    etiqueta: "Popular",
-    descripcion: "Suaves copas de crema combinadas con gelatina y decoradas con crema chantilly y cereza.",
-    notas: "Crema pastelera, gelatina, chantilly, cereza",
-    img: "https://scontent-lim1-1.xx.fbcdn.net/v/t39.30808-6/662591386_1566583222134485_1736429201353428355_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=7b2446&_nc_ohc=UQMxw45VangQ7kNvwGRmVeO&_nc_oc=Adr8zb2QshUVlVszAc3zGJz7HCXp1KCdV_B9OMHFPaUKncWSh2CLt0aota0nSNywTco&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=XEV_es6up5Rs-dAgVD7ung&_nc_ss=7b2a8&oh=00_Af1u1jnffPi7syhti8zmfvns0gYEZGWgGvvh5oXLuDerDw&oe=69F834B0",
-    ingredientes: "Crema pastelera, gelatina de sabores (limón o piña), crema chantilly, cereza en almíbar, base de bizcocho o galleta.",
-    informacion: "Postre ligero y refrescante, con presentación atractiva y sabor equilibrado.",
-  },
-];
-
-const categorias = ["Todas", ...Array.from(new Set(postres.map(p => p.categoria)))];
 
 const etiquetaColor = {
   "Popular":   { bg: "#ffdcbd", text: "#6b3800" },
   "Nuevo":     { bg: "#d1f0d9", text: "#165128" },
   "Favorito":  { bg: "#fce4ec", text: "#7b003a" },
   "Temporada": { bg: "#e8f5e9", text: "#1a5c26" },
+  "Últimos":   { bg: "#ffebee", text: "#b71c1c" }
 };
 
 export default function Postres() {
+  const [postres, setPostres] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [postreSeleccionado, setPostreSeleccionado] = useState(null);
   const [toastVisible, setToastVisible] = useState(false);
+
+  useEffect(() => {
+    const fetchProductos = async () => {
+      try {
+        const data = await productService.getAllProducts();
+        // Mapear al modelo que espera la UI
+        const mapped = data.map(p => ({
+          id: p.id,
+          categoria: p.category?.name || "Postres",
+          nombre: p.name,
+          precio: p.price,
+          porciones: "1 porción",
+          etiqueta: p.stock < 5 ? "Últimos" : (p.stock > 20 ? "Popular" : null),
+          descripcion: p.description || "Delicioso postre artesanal preparado con ingredientes selectos.",
+          notas: "Receta de la casa",
+          img: p.imageUrl || fallbackImg,
+          ingredientes: "Ingredientes premium, amor y dedicación.",
+          informacion: "Textura cremosa y sabor único."
+        }));
+        setPostres(mapped);
+      } catch (error) {
+        console.error("Error al cargar postres:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProductos();
+  }, []);
 
   const showAddToast = () => {
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 1800);
   };
+
+  const categorias = ["Todas", ...Array.from(new Set(postres.map(p => p.categoria)))];
 
   const filtrados = postres.filter(p =>
     categoriaActiva === "Todas" || p.categoria === categoriaActiva
@@ -111,9 +61,17 @@ export default function Postres() {
 
   const gruposPorCategoria = Array.from(new Set(postres.map(p => p.categoria)));
 
-  const mostrarBento = categoriaActiva === "Todas";
+  const mostrarBento = categoriaActiva === "Todas" && postres.length >= 4;
   const itemsBento = postres.slice(0, 4);
   const itemsRestantes = mostrarBento ? postres.slice(4) : filtrados;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#fbf9f5] flex justify-center items-center">
+        <p className="font-bold text-[#6f4014]">Cargando menú...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fbf9f5] text-[#1b1c1a] font-sans selection:bg-[#ffdcc5] selection:text-[#663100]">
