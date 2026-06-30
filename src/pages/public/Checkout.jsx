@@ -51,19 +51,69 @@ export default function Checkout() {
 
   const handleFinalizePurchase = async () => {
     setLoading(true);
-    // Simulate Culqi Payment Delay
-    await new Promise(r => setTimeout(r, 2000));
 
-    // Actually create the order in Backend
-    const result = await checkoutCartFlow();
-    
-    setLoading(false);
-    
-    if (result.ok) {
-      setOrderId(result.orderId);
+    try {
+      // 1. Actually create the order in Backend (Status PENDIENTE)
+      const result = await checkoutCartFlow();
+      
+      if (!result.ok) {
+        alert(result.message);
+        setLoading(false);
+        return;
+      }
+      
+      const createdOrderId = result.orderId;
+
+      // 2. Generate Token with Culqi API
+      const culqiResponse = await fetch('https://secure.culqi.com/v2/tokens', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer pk_test_1lkJqN3Keqh5EBqV'
+        },
+        body: JSON.stringify({
+          card_number: paymentData.cardNumber.replace(/\s/g, ''),
+          cvv: paymentData.cvc,
+          expiration_month: paymentData.expiry.split('/')[0]?.trim(),
+          expiration_year: paymentData.expiry.split('/')[1]?.trim(),
+          email: user?.email || 'cliente@briselli.com'
+        })
+      });
+
+      const culqiData = await culqiResponse.json();
+
+      if (!culqiResponse.ok) {
+        throw new Error(culqiData.user_message || 'Error al procesar la tarjeta con Culqi.');
+      }
+
+      // 3. Send Charge to Backend
+      const token = localStorage.getItem('briselli_token');
+      const backendBaseUrl = import.meta.env.VITE_API_URL || 'https://sistemas-para-panaderia-backend.onrender.com/api';
+      
+      const chargeResponse = await fetch(`${backendBaseUrl}/payments/charge`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          orderId: createdOrderId,
+          culqiToken: culqiData.id,
+          email: user?.email || 'cliente@briselli.com'
+        })
+      });
+
+      if (!chargeResponse.ok) {
+        throw new Error('Error al confirmar el cobro en el servidor.');
+      }
+
+      setOrderId(createdOrderId);
       setStep(4);
-    } else {
-      alert(result.message);
+
+    } catch (error) {
+      alert(`Error en el pago: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
