@@ -203,9 +203,10 @@ export default function Checkout() {
                 <div>
                   <label className="block text-sm font-bold text-[#6f4014] mb-2">Teléfono de Contacto</label>
                   <input 
-                    type="text" 
+                    type="tel" 
+                    maxLength="9"
                     value={shippingInfo.phone}
-                    onChange={e => setShippingInfo({...shippingInfo, phone: e.target.value})}
+                    onChange={e => setShippingInfo({...shippingInfo, phone: e.target.value.replace(/\D/g, '').slice(0, 9)})}
                     placeholder="Ej: 987654321" 
                     className="w-full border border-orange-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8d4b00]" 
                   />
@@ -227,7 +228,7 @@ export default function Checkout() {
               <button onClick={() => setStep(1)} className="px-6 py-3 text-[#8d4b00] font-bold hover:bg-orange-50 rounded-full transition-colors">
                 Volver
               </button>
-              <button onClick={handleNextStep} disabled={!shippingInfo.address || !shippingInfo.phone} className="px-8 py-3 bg-[#8d4b00] text-white rounded-full font-black uppercase tracking-widest hover:bg-[#6e3900] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+              <button onClick={handleNextStep} disabled={!shippingInfo.address || shippingInfo.phone.length !== 9} className="px-8 py-3 bg-[#8d4b00] text-white rounded-full font-black uppercase tracking-widest hover:bg-[#6e3900] transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
                 Ir al Pago
               </button>
             </div>
@@ -255,26 +256,39 @@ export default function Checkout() {
                 <div>
                   <input 
                     type="text" 
-                    placeholder="Número de Tarjeta (Mock)" 
+                    maxLength="19"
+                    placeholder="Número de Tarjeta" 
                     value={paymentData.cardNumber}
-                    onChange={e => setPaymentData({...paymentData, cardNumber: e.target.value})}
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono" 
+                    onChange={e => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      const formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+                      setPaymentData({...paymentData, cardNumber: formatted});
+                    }}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono text-lg tracking-widest" 
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <input 
                     type="text" 
+                    maxLength="5"
                     placeholder="MM/YY" 
                     value={paymentData.expiry}
-                    onChange={e => setPaymentData({...paymentData, expiry: e.target.value})}
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono" 
+                    onChange={e => {
+                      let val = e.target.value.replace(/\D/g, '');
+                      if (val.length >= 3) {
+                        val = val.slice(0,2) + '/' + val.slice(2,4);
+                      }
+                      setPaymentData({...paymentData, expiry: val});
+                    }}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono text-center tracking-widest" 
                   />
                   <input 
                     type="text" 
+                    maxLength="4"
                     placeholder="CVC" 
                     value={paymentData.cvc}
-                    onChange={e => setPaymentData({...paymentData, cvc: e.target.value})}
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono" 
+                    onChange={e => setPaymentData({...paymentData, cvc: e.target.value.replace(/\D/g, '').slice(0, 4)})}
+                    className="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white font-mono text-center tracking-widest" 
                   />
                 </div>
                 <div>
@@ -295,8 +309,8 @@ export default function Checkout() {
               </button>
               <button 
                 onClick={handleFinalizePurchase} 
-                disabled={loading || !paymentData.cardNumber}
-                className="px-8 py-4 bg-emerald-600 text-white rounded-full font-black uppercase tracking-widest hover:bg-emerald-700 transition-colors shadow-lg disabled:opacity-70 flex items-center gap-2"
+                disabled={loading || paymentData.cardNumber.replace(/\s/g, '').length < 15 || paymentData.expiry.length < 5 || paymentData.cvc.length < 3 || !paymentData.name}
+                className="px-8 py-4 bg-emerald-600 text-white rounded-full font-black uppercase tracking-widest hover:bg-emerald-700 transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {loading ? (
                   <span className="animate-pulse">Procesando...</span>
