@@ -50,11 +50,6 @@ function buildInventoryItem(product) {
 import { orderService } from '../services/orderService';
 
 export function addProductToCartFlow(product) {
-  const user = getCurrentUser();
-  if (!user) {
-    return { ok: false, message: "Debes iniciar sesión para comprar." };
-  }
-
   const cart = readJson(CART_KEY, []);
   const cartIndex = cart.findIndex(
     (item) => item.id === product.id || normalizeText(item.name) === normalizeText(product.nombre)
