@@ -64,6 +64,9 @@ export default function Checkout() {
       
       const createdOrderId = result.orderId;
 
+      const expYearRaw = paymentData.expiry.split('/')[1]?.trim() || '';
+      const expYear = expYearRaw.length === 2 ? `20${expYearRaw}` : expYearRaw;
+
       // 2. Generate Token with Culqi API
       const culqiResponse = await fetch('https://secure.culqi.com/v2/tokens', {
         method: 'POST',
@@ -75,7 +78,7 @@ export default function Checkout() {
           card_number: paymentData.cardNumber.replace(/\s/g, ''),
           cvv: paymentData.cvc,
           expiration_month: paymentData.expiry.split('/')[0]?.trim(),
-          expiration_year: paymentData.expiry.split('/')[1]?.trim(),
+          expiration_year: expYear,
           email: user?.email || 'cliente@briselli.com'
         })
       });
