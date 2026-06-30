@@ -120,6 +120,7 @@ export async function checkoutCartFlow() {
     return { ok: true, message: "Compra realizada correctamente.", orderId: res.id };
   } catch (error) {
     console.error("Checkout error:", error);
-    return { ok: false, message: "Error al procesar el pedido. Verifica la conexión o el stock." };
+    const backendMsg = error.response?.data?.message || error.response?.data || error.message;
+    return { ok: false, message: `Error: ${backendMsg}` };
   }
 }
