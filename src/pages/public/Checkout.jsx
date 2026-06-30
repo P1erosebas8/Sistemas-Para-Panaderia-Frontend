@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getAuthSession } from '../../utils/authSession';
-import { checkoutCartFlow, removeProductFromCartFlow, CART_KEY } from '../../utils/cartFlow';
+import { checkoutCartFlow, removeProductFromCartFlow, updateProductQuantityFlow, CART_KEY } from '../../utils/cartFlow';
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -160,8 +160,23 @@ export default function Checkout() {
                 <div key={item.id} className="flex items-center gap-4 p-4 bg-orange-50/50 rounded-2xl">
                   <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-xl shadow-sm" />
                   <div className="flex-1">
-                    <h3 className="font-bold text-[#6f4014]">{item.name}</h3>
-                    <p className="text-sm text-orange-800/60">Cantidad: {item.quantity}</p>
+                    <h3 className="font-bold text-[#6f4014] text-lg">{item.name}</h3>
+                    <div className="flex items-center gap-3 mt-2">
+                      <button 
+                        onClick={() => setCartItems(updateProductQuantityFlow(item.id, -1))}
+                        disabled={item.quantity <= 1}
+                        className="w-8 h-8 rounded-full bg-orange-100 text-[#8d4b00] font-bold hover:bg-orange-200 transition-colors flex items-center justify-center disabled:opacity-50"
+                      >
+                        -
+                      </button>
+                      <span className="font-black text-[#6f4014] w-4 text-center">{item.quantity}</span>
+                      <button 
+                        onClick={() => setCartItems(updateProductQuantityFlow(item.id, 1))}
+                        className="w-8 h-8 rounded-full bg-orange-100 text-[#8d4b00] font-bold hover:bg-orange-200 transition-colors flex items-center justify-center"
+                      >
+                        +
+                      </button>
+                    </div>
                   </div>
                   <div className="text-right flex flex-col items-end gap-2">
                     <p className="font-black text-[#8d4b00]">S/ {(item.price * item.quantity).toFixed(2)}</p>

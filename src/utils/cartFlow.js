@@ -99,6 +99,30 @@ export function removeProductFromCartFlow(productId) {
   return cart;
 }
 
+export function updateProductQuantityFlow(productId, change) {
+  let cart = readJson(CART_KEY, []);
+  const index = cart.findIndex(item => item.id === productId);
+  
+  if (index >= 0) {
+    const currentQty = Number(cart[index].quantity) || 1;
+    const newQty = currentQty + change;
+    
+    if (newQty >= 1) {
+      cart[index].quantity = newQty;
+      cart[index].total = newQty * (Number(cart[index].price) || 0);
+      writeJson(CART_KEY, cart);
+      
+      const cartUnits = getCartUnits(cart);
+      window.dispatchEvent(
+        new CustomEvent("briselli_cart_updated", {
+          detail: { count: cartUnits },
+        })
+      );
+    }
+  }
+  return cart;
+}
+
 export async function checkoutCartFlow(shippingInfo) {
   const user = getCurrentUser();
   if (!user) return { ok: false, message: "Debes iniciar sesión para finalizar la compra." };
