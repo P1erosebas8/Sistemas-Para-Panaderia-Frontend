@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getAuthSession } from '../../utils/authSession';
-import { checkoutCartFlow, CART_KEY } from '../../utils/cartFlow';
+import { checkoutCartFlow, removeProductFromCartFlow, CART_KEY } from '../../utils/cartFlow';
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ export default function Checkout() {
 
     try {
       // 1. Actually create the order in Backend (Status PENDIENTE)
-      const result = await checkoutCartFlow();
+      const result = await checkoutCartFlow(shippingInfo);
       
       if (!result.ok) {
         alert(result.message);
@@ -163,8 +163,18 @@ export default function Checkout() {
                     <h3 className="font-bold text-[#6f4014]">{item.name}</h3>
                     <p className="text-sm text-orange-800/60">Cantidad: {item.quantity}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex flex-col items-end gap-2">
                     <p className="font-black text-[#8d4b00]">S/ {(item.price * item.quantity).toFixed(2)}</p>
+                    <button 
+                      onClick={() => {
+                        const newCart = removeProductFromCartFlow(item.id);
+                        setCartItems(newCart);
+                      }}
+                      className="text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center justify-center"
+                      title="Eliminar producto"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
                   </div>
                 </div>
               ))}

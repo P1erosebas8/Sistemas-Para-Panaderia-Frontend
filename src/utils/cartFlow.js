@@ -85,7 +85,21 @@ export function addProductToCartFlow(product) {
   return { ok: true, message: "Producto agregado al carrito.", cartCount: cartUnits };
 }
 
-export async function checkoutCartFlow() {
+export function removeProductFromCartFlow(productId) {
+  let cart = readJson(CART_KEY, []);
+  cart = cart.filter(item => item.id !== productId);
+  writeJson(CART_KEY, cart);
+  
+  const cartUnits = getCartUnits(cart);
+  window.dispatchEvent(
+    new CustomEvent("briselli_cart_updated", {
+      detail: { count: cartUnits },
+    })
+  );
+  return cart;
+}
+
+export async function checkoutCartFlow(shippingInfo) {
   const user = getCurrentUser();
   if (!user) return { ok: false, message: "Debes iniciar sesión para finalizar la compra." };
 
@@ -100,7 +114,10 @@ export async function checkoutCartFlow() {
 
     const orderData = {
       userId: user.id || 1, // Fallback to 1 if no user.id
-      items: payloadItems
+      items: payloadItems,
+      deliveryAddress: shippingInfo?.address || '',
+      deliveryPhone: shippingInfo?.phone || '',
+      deliveryNotes: shippingInfo?.notes || ''
     };
 
     const res = await orderService.createOrder(orderData);
