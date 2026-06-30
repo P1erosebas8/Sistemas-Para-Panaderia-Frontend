@@ -73,7 +73,7 @@ export default function UserOrders() {
                     </span>
                   </div>
                   <span className="text-sm text-gray-500">
-                    {new Date(order.createdAt).toLocaleDateString('es-PE', {
+                    {new Date(order.orderDate).toLocaleDateString('es-PE', {
                       year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                     })}
                   </span>
