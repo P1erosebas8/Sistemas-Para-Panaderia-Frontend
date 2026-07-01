@@ -26,6 +26,7 @@ export default function AdminInventory() {
         const mappedProducts = prodData.map(p => ({
           id: p.id,
           name: p.name,
+          description: p.description || "",
           category: p.categoryName || "Sin Categoría",
           price: p.price,
           stock: p.stock,
@@ -66,6 +67,7 @@ export default function AdminInventory() {
         const updated = products.map(p => p.id === currentEditing.id ? {
           ...p,
           name: res.name,
+          description: res.description,
           category: res.categoryName || "Sin Categoría",
           price: res.price,
           stock: res.stock,
@@ -78,6 +80,7 @@ export default function AdminInventory() {
         const newProd = {
           id: res.id,
           name: res.name,
+          description: res.description,
           category: res.categoryName || "Sin Categoría",
           price: res.price,
           stock: res.stock,
