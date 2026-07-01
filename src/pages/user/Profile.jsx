@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { getAuthSession, setAuthSession } from '../../utils/authSession';
+import { userService } from '../../services/userService';
 
 export default function UserProfile() {
     const { onProfileUpdate } = useOutletContext(); // Obtenemos la función del padre
@@ -15,12 +16,32 @@ export default function UserProfile() {
     });
 
     const [message, setMessage] = useState({ type: '', text: '' });
+    const [passData, setPassData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    const [passMessage, setPassMessage] = useState({ type: '', text: '' });
 
     useEffect(() => {
-        const activeUser = getAuthSession();
-        if (activeUser) {
-            setFormData(activeUser);
-        }
+        const fetchProfile = async () => {
+            try {
+                const data = await userService.getProfile();
+                setFormData({
+                    firstName: data.firstName || '',
+                    lastName: data.lastName || '',
+                    dni: data.dni || '',
+                    phone: data.phone || '',
+                    address: data.address || '',
+                    email: data.email || ''
+                });
+                setAuthSession(data); // Sync
+            } catch (error) {
+                console.error("Error fetching profile", error);
+                // Fallback to session if API fails or no token
+                const activeUser = getAuthSession();
+                if (activeUser) {
+                    setFormData(activeUser);
+                }
+            }
+        };
+        fetchProfile();
     }, []);
 
     const handleChange = (e) => {
@@ -32,7 +53,7 @@ export default function UserProfile() {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (formData.dni.length !== 8) {
@@ -42,15 +63,55 @@ export default function UserProfile() {
             return setMessage({ type: 'error', text: 'El teléfono debe tener 9 dígitos.' });
         }
 
-        setAuthSession(formData);
-
-        const allUsers = JSON.parse(localStorage.getItem('briselli_users') || '[]');
-        const updatedUsers = allUsers.map(u => u.email === formData.email ? formData : u);
-        localStorage.setItem('briselli_users', JSON.stringify(updatedUsers));
-        if (onProfileUpdate) onProfileUpdate();
-        setMessage({ type: 'success', text: '¡Perfil actualizado correctamente!' });
+        try {
+            const updatedData = await userService.updateProfile({
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                dni: formData.dni,
+                phone: formData.phone,
+                address: formData.address
+            });
+            
+            setAuthSession(updatedData);
+            if (onProfileUpdate) onProfileUpdate();
+            setMessage({ type: 'success', text: '¡Perfil actualizado correctamente!' });
+        } catch (error) {
+            console.error(error);
+            setMessage({ type: 'error', text: 'Error al actualizar perfil.' });
+        }
 
         setTimeout(() => setMessage({ type: '', text: '' }), 3000);
+    };
+
+    const handlePassChange = (e) => {
+        setPassData({ ...passData, [e.target.name]: e.target.value });
+    };
+
+    const handlePassSubmit = async (e) => {
+        e.preventDefault();
+        if (passData.newPassword !== passData.confirmPassword) {
+            setPassMessage({ type: 'error', text: 'Las contraseñas no coinciden.' });
+            setTimeout(() => setPassMessage({ type: '', text: '' }), 3000);
+            return;
+        }
+        if (passData.newPassword.length < 8) {
+            setPassMessage({ type: 'error', text: 'La nueva contraseña debe tener al menos 8 caracteres.' });
+            setTimeout(() => setPassMessage({ type: '', text: '' }), 3000);
+            return;
+        }
+        try {
+            await userService.changePassword({
+                currentPassword: passData.currentPassword,
+                newPassword: passData.newPassword
+            });
+            setPassMessage({ type: 'success', text: 'Contraseña actualizada exitosamente.' });
+            setPassData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        } catch (error) {
+            console.error(error);
+            const errMsg = typeof error.response?.data === 'string' ? error.response.data : 'Error al cambiar contraseña.';
+            setPassMessage({ type: 'error', text: errMsg });
+        }
+        setTimeout(() => setPassMessage({ type: '', text: '' }), 3000);
     };
 
     return (
@@ -155,6 +216,67 @@ export default function UserProfile() {
                         className="w-full md:w-auto px-12 py-4 bg-artisan-primary text-white font-black uppercase text-xs tracking-[0.2em] rounded-2xl hover:bg-artisan-secondary transition-all shadow-lg shadow-orange-100"
                     >
                         Guardar Cambios
+                    </button>
+                </div>
+            </form>
+
+            <div className="mt-12 mb-8 border-t border-gray-100 pt-8">
+                <h2 className="text-2xl font-black text-artisan-primary uppercase tracking-tighter">Seguridad</h2>
+                <p className="text-gray-500 text-sm">Cambia tu contraseña regularmente para mantener tu cuenta segura.</p>
+            </div>
+
+            {passMessage.text && (
+                <div className={`mb-6 p-4 rounded-xl text-sm font-bold ${passMessage.type === 'success' ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'
+                    }`}>
+                    {passMessage.text}
+                </div>
+            )}
+
+            <form onSubmit={handlePassSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Contraseña Actual</label>
+                        <input
+                            type="password"
+                            name="currentPassword"
+                            value={passData.currentPassword}
+                            onChange={handlePassChange}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-artisan-secondary outline-none transition-all bg-gray-50/50"
+                            required
+                        />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Nueva Contraseña</label>
+                        <input
+                            type="password"
+                            name="newPassword"
+                            value={passData.newPassword}
+                            onChange={handlePassChange}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-artisan-secondary outline-none transition-all bg-gray-50/50"
+                            required
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Confirmar Nueva Contraseña</label>
+                        <input
+                            type="password"
+                            name="confirmPassword"
+                            value={passData.confirmPassword}
+                            onChange={handlePassChange}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-100 focus:border-artisan-secondary outline-none transition-all bg-gray-50/50"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="pt-4">
+                    <button
+                        type="submit"
+                        className="w-full md:w-auto px-12 py-4 bg-[#8d4b00] text-white font-black uppercase text-xs tracking-[0.2em] rounded-2xl hover:bg-[#6e3900] transition-all shadow-lg shadow-orange-900/20"
+                    >
+                        Cambiar Contraseña
                     </button>
                 </div>
             </form>
