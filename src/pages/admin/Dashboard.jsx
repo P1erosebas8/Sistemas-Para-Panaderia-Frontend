@@ -68,7 +68,7 @@ export default function AdminDashboard() {
           return acc;
         }, { Pasteles: 0, Panes: 0, Postres: 0 });
 
-        const todaySales = salesData.total || 0;
+        const todaySales = salesData.totalSales || 0;
 
         const pendingOrders = ordersData.filter(
           (order) => String(order.status || '').toLowerCase() === 'pendiente' || String(order.status || '').toLowerCase() === 'pending'
