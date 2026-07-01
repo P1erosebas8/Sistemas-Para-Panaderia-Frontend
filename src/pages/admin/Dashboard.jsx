@@ -56,7 +56,7 @@ export default function AdminDashboard() {
         const savedUsers = JSON.parse(localStorage.getItem('briselli_users') || '[]');
         const activeUsers = savedUsers.filter(u => u.status === 'Activo').length || 1;
 
-        const activeS = branchesData.filter(s => String(s.status || '').toUpperCase() === 'ACTIVO' || String(s.status || '').toUpperCase() === 'ACTIVE').length;
+        const activeS = branchesData.filter(s => s.isActive === true).length;
         const inactiveS = branchesData.length - activeS;
 
         const value = productsData.reduce((acc, p) => acc + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
