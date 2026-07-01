@@ -15,7 +15,7 @@ export default function LocationPage() {
     const fetchBranches = async () => {
       try {
         const data = await branchService.getAllBranches();
-        const filtered = data.filter(s => s.status === 'Activo' || s.status === 'ACTIVE');
+        const filtered = data.filter(s => s.isActive === true);
         // Asegurarse de mapear lat/lng a coords si vienen sueltos en el backend
         const formatted = filtered.map(b => ({
           ...b,
