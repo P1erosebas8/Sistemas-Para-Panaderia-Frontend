@@ -5,6 +5,7 @@ import { authService } from '../../services/authService';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [showOtp, setShowOtp] = useState(false);
     const [otp, setOtp] = useState('');
     const [email, setEmail] = useState('');
@@ -18,6 +19,25 @@ const Login = () => {
         setLoading(true);
 
         try {
+            if (isForgotPassword) {
+                if (showOtp) {
+                    // Reset Password
+                    const res = await authService.resetPassword({ email, otp, newPassword: password });
+                    alert(res || "Contraseña actualizada correctamente.");
+                    setIsForgotPassword(false);
+                    setIsLogin(true);
+                    setShowOtp(false);
+                    setPassword('');
+                    setOtp('');
+                } else {
+                    // Send OTP
+                    const res = await authService.forgotPassword(email);
+                    alert(res || "Código enviado a tu correo.");
+                    setShowOtp(true);
+                }
+                return;
+            }
+
             if (showOtp) {
                 // Verificar OTP
                 const res = await authService.verifyOtp({ email, otp });
@@ -88,7 +108,7 @@ const Login = () => {
                         </div>
                         <h1 className="text-3xl font-black text-[#8d4b00] tracking-tighter uppercase">Briselli</h1>
                         <p className="text-[#554336] text-[10px] font-bold uppercase tracking-widest mt-1">
-                            {isLogin ? 'Acceso al Sistema' : 'Registro de Cliente'}
+                            {isForgotPassword ? 'Recuperar Contraseña' : isLogin ? 'Acceso al Sistema' : 'Registro de Cliente'}
                         </p>
                     </div>
 
@@ -108,10 +128,23 @@ const Login = () => {
                                     placeholder="123456"
                                     maxLength={6}
                                 />
+                                {isForgotPassword && (
+                                    <div className="space-y-1.5 pt-3">
+                                        <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Nueva Contraseña</label>
+                                        <input
+                                            required
+                                            type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full h-12 px-5 bg-gray-50 border-2 border-gray-100 focus:border-[#8d4b00] focus:bg-white rounded-2xl text-sm transition-all outline-none"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <>
-                                {!isLogin && (
+                                {!isLogin && !isForgotPassword && (
                             <div className="space-y-1.5">
                                 <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Nombre Completo</label>
                                 <input
@@ -137,6 +170,7 @@ const Login = () => {
                             />
                         </div>
 
+                        {!isForgotPassword && (
                         <div className="space-y-1.5">
                             <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Contraseña</label>
                             <input
@@ -148,6 +182,7 @@ const Login = () => {
                                 placeholder="••••••••"
                             />
                         </div>
+                        )}
 
                             </>
                         )}
@@ -157,17 +192,40 @@ const Login = () => {
                             disabled={loading}
                             className="w-full h-12 bg-[#8d4b00] text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-lg shadow-orange-900/20 hover:bg-[#6e3900] active:scale-[0.98] transition-all mt-4 disabled:opacity-50"
                         >
-                            {loading ? 'Cargando...' : showOtp ? 'Verificar' : isLogin ? 'Entrar' : 'Crear Cuenta'}
+                            {loading ? 'Cargando...' : showOtp ? (isForgotPassword ? 'Restablecer' : 'Verificar') : isForgotPassword ? 'Enviar Código' : isLogin ? 'Entrar' : 'Crear Cuenta'}
                         </button>
                     </form>
 
                     {!showOtp && (
-                        <button
-                            onClick={() => setIsLogin(!isLogin)}
-                            className="mt-6 text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter"
-                        >
-                            {isLogin ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión'}
-                        </button>
+                        <div className="w-full mt-6 space-y-3">
+                            {isForgotPassword ? (
+                                <button
+                                    onClick={() => { setIsForgotPassword(false); setIsLogin(true); }}
+                                    className="w-full text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter"
+                                >
+                                    Volver al inicio de sesión
+                                </button>
+                            ) : (
+                                <>
+                                    {isLogin && (
+                                        <button
+                                            type="button"
+                                            onClick={() => { setIsForgotPassword(true); setIsLogin(false); }}
+                                            className="w-full text-[11px] font-bold text-gray-500 hover:text-gray-800 transition-colors tracking-tight block text-center"
+                                        >
+                                            ¿Olvidaste tu contraseña?
+                                        </button>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsLogin(!isLogin)}
+                                        className="w-full text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter block text-center"
+                                    >
+                                        {isLogin ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión'}
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     )}
                 </div>
             </main>
