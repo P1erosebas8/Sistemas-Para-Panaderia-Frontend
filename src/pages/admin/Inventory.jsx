@@ -21,7 +21,7 @@ export default function AdminInventory() {
           productService.getAllProductsAdmin(),
           api.get('/categories').then(res => res.data)
         ]);
-        
+
         // Map backend products to frontend structure
         const mappedProducts = prodData.map(p => ({
           id: p.id,
@@ -33,7 +33,7 @@ export default function AdminInventory() {
           image: p.imageUrl || "",
           originalProduct: p
         }));
-        
+
         setProducts(mappedProducts);
         setCategories(catData);
       } catch (err) {
@@ -42,7 +42,7 @@ export default function AdminInventory() {
         setLoading(false);
       }
     };
-    
+
     loadInventory();
   }, []);
 
@@ -112,8 +112,8 @@ export default function AdminInventory() {
   const filteredProducts = products.filter(p => {
     const matchesSearch = (p.name || "").toLowerCase().includes(searchTerm.toLowerCase()) || (p.category || "").toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCat = filterCategory === "Todas" || p.category === filterCategory;
-    const matchesStatus = filterStatus === "Todos" 
-      ? true 
+    const matchesStatus = filterStatus === "Todos"
+      ? true
       : (filterStatus === "Activos" ? p.originalProduct?.status !== 'INACTIVO' : p.originalProduct?.status === 'INACTIVO');
     return matchesSearch && matchesCat && matchesStatus;
   });
@@ -134,7 +134,7 @@ export default function AdminInventory() {
           <h2 className="text-3xl font-black text-artisan-primary tracking-tighter">Inventario Maestro</h2>
           <p className="text-artisan-tertiary text-sm font-medium">Briselli: Gestión de Pasteles, Panes y Postres</p>
         </div>
-        <button 
+        <button
           onClick={() => { setCurrentEditing(null); setIsModalOpen(true); }}
           className="bg-artisan-secondary text-white px-8 py-3 rounded-xl font-black shadow-lg hover:bg-artisan-primary hover:-translate-y-1 transition-all"
         >
@@ -144,7 +144,7 @@ export default function AdminInventory() {
 
       <div className="flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <input 
+          <input
             type="text"
             placeholder="Buscar producto por nombre o categoría..."
             className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-artisan-secondary transition-all"
@@ -153,16 +153,16 @@ export default function AdminInventory() {
           />
           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl grayscale">🔍</span>
         </div>
-        <select 
-          value={filterCategory} 
+        <select
+          value={filterCategory}
           onChange={e => setFilterCategory(e.target.value)}
           className="px-4 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm outline-none font-bold text-gray-600 focus:ring-2 focus:ring-artisan-secondary"
         >
           <option value="Todas">Todas las Categorías</option>
           {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
         </select>
-        <select 
-          value={filterStatus} 
+        <select
+          value={filterStatus}
           onChange={e => setFilterStatus(e.target.value)}
           className="px-4 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm outline-none font-bold text-gray-600 focus:ring-2 focus:ring-artisan-secondary"
         >
@@ -211,7 +211,7 @@ export default function AdminInventory() {
                   </td>
                   <td className="p-4">
                     <div className={`flex items-center gap-2 font-black ${p.stock < 5 ? 'text-red-500' : 'text-artisan-dark'}`}>
-                      {p.stock} 
+                      {p.stock}
                       {p.stock < 5 && <span className="text-[10px] animate-pulse">¡BAJO!</span>}
                     </div>
                   </td>
@@ -222,14 +222,14 @@ export default function AdminInventory() {
                   </td>
                   <td className="p-4 text-center">
                     <div className="flex justify-center gap-4">
-                      <button 
+                      <button
                         onClick={() => { setCurrentEditing(p); setIsModalOpen(true); }}
                         className="p-2 hover:bg-artisan-secondary/10 rounded-lg transition-colors"
                         title="Editar"
                       >
                         ✏️
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleToggleStatus(p.id)}
                         className={`p-2 rounded-lg transition-colors grayscale hover:grayscale-0 ${p.originalProduct?.status === 'INACTIVO' ? 'hover:bg-green-50' : 'hover:bg-red-50'}`}
                         title={p.originalProduct?.status === 'INACTIVO' ? 'Activar Producto' : 'Desactivar Producto'}
@@ -251,9 +251,9 @@ export default function AdminInventory() {
         </table>
       </div>
 
-      <ProductModal 
-        isOpen={isModalOpen} 
-        onClose={() => { setIsModalOpen(false); setCurrentEditing(null); }} 
+      <ProductModal
+        isOpen={isModalOpen}
+        onClose={() => { setIsModalOpen(false); setCurrentEditing(null); }}
         onSave={handleSave}
         editingProduct={currentEditing}
       />
