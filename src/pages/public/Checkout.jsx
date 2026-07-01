@@ -28,6 +28,14 @@ export default function Checkout() {
   useEffect(() => {
     const session = getAuthSession();
     setUser(session);
+    
+    if (session) {
+      setShippingInfo(prev => ({
+        ...prev,
+        address: session.address || '',
+        phone: session.phone || ''
+      }));
+    }
 
     try {
       const items = JSON.parse(localStorage.getItem(CART_KEY) || '[]');
@@ -215,7 +223,7 @@ export default function Checkout() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-bold text-[#6f4014] mb-2">Nombre del Cliente</label>
-                <input type="text" readOnly value={user?.firstName || user?.email || ''} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed" />
+                <input type="text" readOnly value={`${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.email || ''} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-500 cursor-not-allowed" />
               </div>
               <div>
                 <label className="block text-sm font-bold text-[#6f4014] mb-2">Dirección de Entrega</label>

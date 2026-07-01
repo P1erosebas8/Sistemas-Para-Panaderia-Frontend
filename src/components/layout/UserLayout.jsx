@@ -14,7 +14,7 @@ export default function UserLayout() {
     const loadUserData = () => {
         const activeUser = getAuthSession();
         if (activeUser && activeUser.firstName) {
-            setUserName(`${activeUser.firstName} ${activeUser.lastName}`);
+            setUserName(`${activeUser.firstName} ${activeUser.lastName || ''}`.trim());
         }
     };
     const handleLogout = () => {
