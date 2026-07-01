@@ -38,8 +38,8 @@ export const productService = {
     return response.data;
   },
 
-  deactivateProduct: async (id) => {
-    const response = await api.patch(`/admin/products/${id}/deactivate`);
+  toggleProductStatus: async (id) => {
+    const response = await api.patch(`/admin/products/${id}/toggle-status`);
     return response.data;
   }
 };

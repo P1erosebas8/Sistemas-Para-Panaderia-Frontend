@@ -17,7 +17,7 @@ export default function AdminOrders() {
           customer: `Cliente ID: ${o.userId || 'N/A'}`,
           date: o.orderDate,
           total: o.totalAmount,
-          status: String(o.status || '').toUpperCase() === 'PENDING' ? 'Pendiente' : String(o.status || ''),
+          status: String(o.status || '').toUpperCase() === 'PENDING' ? 'Pendiente' : String(o.status || '').charAt(0).toUpperCase() + String(o.status || '').slice(1).toLowerCase(),
           items: (o.items || []).map(item => `${item.quantity}x ${item.productName}`).join(', '),
           originalItems: o.items || []
         }));
@@ -35,8 +35,7 @@ export default function AdminOrders() {
 
   const updateStatus = async (rawId, newStatus) => {
     try {
-      // Backend probably expects 'ENTREGADO' or 'COMPLETED'
-      await orderService.updateOrderStatus(rawId, { status: 'ENTREGADO' });
+      await orderService.updateOrderStatus(rawId, { status: newStatus.toUpperCase() });
       const updated = orders.map(order => 
         order.rawId === rawId ? { ...order, status: newStatus } : order
       );
@@ -360,14 +359,17 @@ export default function AdminOrders() {
                   </td>
                   <td className="p-5">
                     <div className="flex justify-center gap-2">
-                      {order.status === 'Pendiente' && (
-                        <button 
-                          onClick={() => updateStatus(order.rawId, 'Entregado')}
-                          className="bg-artisan-primary text-white text-[10px] font-bold px-3 py-2 rounded-lg hover:bg-artisan-secondary transition-colors"
-                        >
-                          MARCAR ENTREGADO
-                        </button>
-                      )}
+                      <select
+                        value={order.status}
+                        onChange={(e) => updateStatus(order.rawId, e.target.value)}
+                        className="bg-white border border-gray-200 text-[10px] font-bold px-2 py-2 rounded-lg text-gray-700 outline-none hover:border-artisan-secondary transition-colors"
+                      >
+                        <option value="Pendiente">Pendiente</option>
+                        <option value="Pagado">Pagado</option>
+                        <option value="En camino">En Camino</option>
+                        <option value="Entregado">Entregado</option>
+                        <option value="Cancelado">Cancelado</option>
+                      </select>
                       <button
                         onClick={() => createVoucher(order)}
                         className="bg-amber-50 text-amber-700 text-[10px] font-bold px-3 py-2 rounded-lg hover:bg-amber-100 transition-colors"

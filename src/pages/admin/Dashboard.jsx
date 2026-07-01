@@ -59,9 +59,10 @@ export default function AdminDashboard() {
         const activeS = branchesData.filter(s => s.isActive === true).length;
         const inactiveS = branchesData.length - activeS;
 
-        const value = productsData.reduce((acc, p) => acc + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
+        const activeProducts = productsData.filter(p => p.status !== 'INACTIVO');
+        const value = activeProducts.reduce((acc, p) => acc + ((Number(p.price) || 0) * (Number(p.stock) || 0)), 0);
         
-        const categories = productsData.reduce((acc, p) => {
+        const categories = activeProducts.reduce((acc, p) => {
           const normalized = normalizeCategory(p.categoryName);
           acc[normalized] = (acc[normalized] || 0) + 1;
           return acc;
@@ -74,7 +75,7 @@ export default function AdminDashboard() {
         ).length;
 
         setStats({
-          totalProducts: productsData.length,
+          totalProducts: activeProducts.length,
           inventoryValue: value,
           lowStockCount: lowStockData.length,
           activeStaff: activeUsers,
