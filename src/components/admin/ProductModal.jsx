@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 const initialForm = {
   name: '',
+  description: '',
   category: 'Pasteles',
   price: '',
   stock: '',
@@ -11,6 +12,7 @@ const initialForm = {
 
 export default function ProductModal({ isOpen, onClose, onSave, editingProduct }) {
   const [product, setProduct] = useState(initialForm);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (editingProduct) {
@@ -38,6 +40,35 @@ export default function ProductModal({ isOpen, onClose, onSave, editingProduct }
     handleClose();
   };
 
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    // Cambiar 'briselli_preset' por el preset de cloudinary real
+    formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_PRESET || "ml_default");
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dtksj11o3'}/image/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if(data.secure_url) {
+        setProduct({ ...product, image: data.secure_url });
+      } else {
+        alert("No se pudo subir la imagen.");
+      }
+    } catch (error) {
+      console.error("Error subiendo imagen:", error);
+      alert("Error al subir imagen");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
@@ -61,13 +92,31 @@ export default function ProductModal({ isOpen, onClose, onSave, editingProduct }
           </div>
 
           <div>
-            <label className="block text-xs font-black uppercase text-artisan-tertiary mb-1">URL de Imagen</label>
-            <input 
+            <label className="block text-xs font-black uppercase text-artisan-tertiary mb-1">Descripción</label>
+            <textarea 
+              required
+              rows={2}
               className="w-full border-2 border-gray-100 p-2.5 rounded-xl focus:border-artisan-secondary outline-none transition-colors"
-              placeholder="https://images.com/foto.jpg"
-              value={product.image}
-              onChange={(e) => setProduct({...product, image: e.target.value})}
+              value={product.description}
+              onChange={(e) => setProduct({...product, description: e.target.value})}
+              placeholder="Ej: Deliciosa torta con doble relleno..."
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-black uppercase text-artisan-tertiary mb-1">Fotografía del Producto (Cloudinary)</label>
+            <input 
+              type="file"
+              accept="image/*"
+              className="w-full border-2 border-gray-100 p-2.5 rounded-xl focus:border-artisan-secondary outline-none transition-colors"
+              onChange={handleImageUpload}
+            />
+            {uploading && <p className="text-xs font-bold text-orange-500 mt-1 animate-pulse">Subiendo imagen a Cloudinary...</p>}
+            {product.image && !uploading && (
+              <div className="mt-2">
+                <img src={product.image} alt="Preview" className="h-16 w-16 object-cover rounded-xl border border-gray-200" />
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -104,7 +153,7 @@ export default function ProductModal({ isOpen, onClose, onSave, editingProduct }
             <button type="button" onClick={handleClose} className="flex-1 px-4 py-3 bg-gray-100 rounded-xl font-bold text-gray-500 hover:bg-gray-200 transition-colors">
               Cancelar
             </button>
-            <button type="submit" className="flex-1 px-4 py-3 bg-artisan-secondary text-white rounded-xl font-bold hover:bg-artisan-primary shadow-lg shadow-artisan-secondary/20 transition-all">
+            <button type="submit" disabled={uploading} className={`flex-1 px-4 py-3 text-white rounded-xl font-bold shadow-lg shadow-artisan-secondary/20 transition-all ${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-artisan-secondary hover:bg-artisan-primary'}`}>
               {editingProduct ? 'Actualizar' : 'Guardar'}
             </button>
           </div>
