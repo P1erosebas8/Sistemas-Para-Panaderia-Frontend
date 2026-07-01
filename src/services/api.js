@@ -17,7 +17,7 @@ api.interceptors.request.use(
     const isPublic = publicEndpoints.some(ep => 
       (config.url || '').includes(ep) && 
       (config.method || '').toLowerCase() === 'get'
-    );
+    ) && !(config.url || '').includes('/admin');
     
     if (token && !isPublic) {
       config.headers.Authorization = `Bearer ${token}`;
