@@ -21,7 +21,7 @@ export default function AdminOrders() {
           items: (o.items || []).map(item => `${item.quantity}x ${item.productName}`).join(', '),
           originalItems: o.items || []
         }));
-        
+
         setOrders(mapped);
       } catch (err) {
         console.error('Error al cargar órdenes:', err);
@@ -36,7 +36,7 @@ export default function AdminOrders() {
   const updateStatus = async (rawId, newStatus) => {
     try {
       await orderService.updateOrderStatus(rawId, { status: newStatus.toUpperCase() });
-      const updated = orders.map(order => 
+      const updated = orders.map(order =>
         order.rawId === rawId ? { ...order, status: newStatus } : order
       );
       setOrders(updated);
@@ -46,8 +46,8 @@ export default function AdminOrders() {
     }
   };
 
-  const filteredOrders = filter === 'Todos' 
-    ? orders 
+  const filteredOrders = filter === 'Todos'
+    ? orders
     : orders.filter(o => o.status === filter);
 
   const formatOrderDateTime = (value) => {
@@ -71,7 +71,7 @@ export default function AdminOrders() {
   };
 
   const exportToCSV = () => {
-    if(filteredOrders.length === 0) return alert("No hay datos para exportar");
+    if (filteredOrders.length === 0) return alert("No hay datos para exportar");
     const headers = ["ID Pedido", "Cliente", "Fecha", "Productos", "Total", "Estado"];
     const csvContent = [
       headers.join(','),
@@ -84,7 +84,7 @@ export default function AdminOrders() {
         `"${o.status}"`
       ].join(','))
     ].join('\n');
-    
+
     const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
     const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
@@ -320,7 +320,7 @@ export default function AdminOrders() {
           <h2 className="text-3xl font-black text-artisan-primary tracking-tighter">Gestión de Pedidos</h2>
           <p className="text-artisan-tertiary text-sm font-medium">Control de ventas y entregas diarias</p>
         </div>
-        
+
         <div className="flex gap-4 items-center">
           <button
             onClick={exportToCSV}
@@ -328,102 +328,101 @@ export default function AdminOrders() {
           >
             📥 Exportar Excel
           </button>
-          
+
           {/* Filtros de Estado */}
           <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100">
-          {['Todos', 'Pendiente', 'Entregado'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
-                filter === status 
-                ? 'bg-artisan-secondary text-white shadow-md' 
-                : 'text-gray-400 hover:text-artisan-primary'
-              }`}
-            >
-              {status}
-            </button>
-          ))}
+            {['Todos', 'Pendiente', 'Entregado'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${filter === status
+                  ? 'bg-artisan-secondary text-white shadow-md'
+                  : 'text-gray-400 hover:text-artisan-primary'
+                  }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Tabla de Pedidos */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-artisan-neutral/30 text-artisan-primary text-[10px] font-black uppercase tracking-widest">
-            <tr>
-              <th className="p-5 border-b">ID / Cliente</th>
-              <th className="p-5 border-b">Fecha</th>
-              <th className="p-5 border-b">Productos</th>
-              <th className="p-5 border-b">Total</th>
-              <th className="p-5 border-b">Estado</th>
-              <th className="p-5 border-b text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {filteredOrders.length > 0 ? (
-              filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-artisan-neutral/5 transition-colors">
-                  <td className="p-5">
-                    <p className="font-black text-artisan-primary text-sm">{order.id}</p>
-                    <p className="text-artisan-dark font-medium">{order.customer}</p>
-                  </td>
-                  <td className="p-5 text-gray-400 text-sm font-medium">{formatOrderDateTime(order.date)}</td>
-                  <td className="p-5">
-                    <div className="space-y-1">
-                      {getOrderItems(order.items).map((item, index) => (
-                        <p
-                          key={`${order.id}-${index}`}
-                          className="text-xs font-semibold text-artisan-tertiary bg-artisan-neutral/40 px-2 py-1 rounded-lg w-fit"
+          <table className="w-full text-left">
+            <thead className="bg-artisan-neutral/30 text-artisan-primary text-[10px] font-black uppercase tracking-widest">
+              <tr>
+                <th className="p-5 border-b">ID / Cliente</th>
+                <th className="p-5 border-b">Fecha</th>
+                <th className="p-5 border-b">Productos</th>
+                <th className="p-5 border-b">Total</th>
+                <th className="p-5 border-b">Estado</th>
+                <th className="p-5 border-b text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <tr key={order.id} className="hover:bg-artisan-neutral/5 transition-colors">
+                    <td className="p-5">
+                      <p className="font-black text-artisan-primary text-sm">{order.id}</p>
+                      <p className="text-artisan-dark font-medium">{order.customer}</p>
+                    </td>
+                    <td className="p-5 text-gray-400 text-sm font-medium">{formatOrderDateTime(order.date)}</td>
+                    <td className="p-5">
+                      <div className="space-y-1">
+                        {getOrderItems(order.items).map((item, index) => (
+                          <p
+                            key={`${order.id}-${index}`}
+                            className="text-xs font-semibold text-artisan-tertiary bg-artisan-neutral/40 px-2 py-1 rounded-lg w-fit"
+                          >
+                            {item}
+                          </p>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="p-5 font-bold text-artisan-dark">S/ {Number(order.total).toFixed(2)}</td>
+                    <td className="p-5">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${order.status === 'Pendiente'
+                        ? 'bg-orange-100 text-orange-600'
+                        : 'bg-green-100 text-green-600'
+                        }`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="p-5">
+                      <div className="flex justify-center gap-2">
+                        <select
+                          value={order.status}
+                          onChange={(e) => updateStatus(order.rawId, e.target.value)}
+                          className="bg-white border border-gray-200 text-[10px] font-bold px-2 py-2 rounded-lg text-gray-700 outline-none hover:border-artisan-secondary transition-colors"
                         >
-                          {item}
-                        </p>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="p-5 font-bold text-artisan-dark">S/ {Number(order.total).toFixed(2)}</td>
-                  <td className="p-5">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
-                      order.status === 'Pendiente' 
-                      ? 'bg-orange-100 text-orange-600' 
-                      : 'bg-green-100 text-green-600'
-                    }`}>
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="p-5">
-                    <div className="flex justify-center gap-2">
-                      <select
-                        value={order.status}
-                        onChange={(e) => updateStatus(order.rawId, e.target.value)}
-                        className="bg-white border border-gray-200 text-[10px] font-bold px-2 py-2 rounded-lg text-gray-700 outline-none hover:border-artisan-secondary transition-colors"
-                      >
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="Pagado">Pagado</option>
-                        <option value="En camino">En Camino</option>
-                        <option value="Entregado">Entregado</option>
-                        <option value="Cancelado">Cancelado</option>
-                      </select>
-                      <button
-                        onClick={() => createVoucher(order)}
-                        className="bg-amber-50 text-amber-700 text-[10px] font-bold px-3 py-2 rounded-lg hover:bg-amber-100 transition-colors"
-                      >
-                        VOUCHER
-                      </button>
-                    </div>
+                          <option value="Pendiente">Pendiente</option>
+                          <option value="Pagado">Pagado</option>
+                          <option value="En camino">En Camino</option>
+                          <option value="Entregado">Entregado</option>
+                          <option value="Cancelado">Cancelado</option>
+                        </select>
+                        <button
+                          onClick={() => createVoucher(order)}
+                          className="bg-amber-50 text-amber-700 text-[10px] font-bold px-3 py-2 rounded-lg hover:bg-amber-100 transition-colors"
+                        >
+                          VOUCHER
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="p-12 text-center text-gray-300 font-medium italic">
+                    Aún no hay pedidos registrados.
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="6" className="p-12 text-center text-gray-300 font-medium italic">
-                  Aún no hay pedidos registrados.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              )}
+            </tbody>
+          </table>
+        </div>
     </div>
   );
 }

@@ -119,7 +119,7 @@ export default function AdminInventory() {
   });
 
   const exportToCSV = () => {
-    if(filteredProducts.length === 0) return alert("No hay datos para exportar");
+    if (filteredProducts.length === 0) return alert("No hay datos para exportar");
     const headers = ["ID", "Nombre", "Categoria", "Precio", "Stock", "Estado", "Descripcion"];
     const csvContent = [
       headers.join(','),
@@ -133,7 +133,7 @@ export default function AdminInventory() {
         `"${String(p.description || '').replace(/"/g, '""')}"`
       ].join(','))
     ].join('\n');
-    
+
     const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
     const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
