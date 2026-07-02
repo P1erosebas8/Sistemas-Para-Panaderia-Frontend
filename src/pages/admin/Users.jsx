@@ -78,12 +78,6 @@ export default function AdminUsers() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-black text-artisan-primary tracking-tighter uppercase">Personal Briselli</h2>
-        <button
-          onClick={() => setShowModal(true)}
-          className="bg-artisan-secondary text-white px-6 py-2 rounded-xl font-bold hover:bg-artisan-primary transition-all shadow-lg"
-        >
-          + REGISTRAR EMPLEADO
-        </button>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -92,27 +86,19 @@ export default function AdminUsers() {
             <tr>
               <th className="p-5 border-b">Empleado</th>
               <th className="p-5 border-b">Rol</th>
-              <th className="p-5 border-b text-center">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {users.map((u) => (
+            {users.filter(u => String(u.role).toLowerCase() === 'admin').map((u) => (
               <tr key={u.id} className="hover:bg-artisan-neutral/5 transition-colors">
                 <td className="p-5">
-                  <p className="font-bold text-artisan-dark leading-tight">{u.name}</p>
+                  <p className="font-bold text-artisan-dark leading-tight">{u.firstName || u.name} {u.lastName || ''}</p>
                   <p className="text-[10px] text-gray-400 font-mono">{u.email}</p>
                 </td>
                 <td className="p-5">
-                  <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase border ${u.role === 'Admin' ? 'border-purple-200 text-purple-600 bg-purple-50' : 'border-blue-200 text-blue-600 bg-blue-50'
-                    }`}>
+                  <span className="px-2 py-1 rounded-md text-[9px] font-black uppercase border border-purple-200 text-purple-600 bg-purple-50">
                     {u.role}
                   </span>
-                </td>
-                <td className="p-5">
-                  <div className="flex justify-center gap-4 text-lg">
-                    <button onClick={() => startEdit(u)} className="hover:scale-125 transition-transform">✏️</button>
-                    <button onClick={() => deleteUser(u.id)} className="hover:scale-125 transition-transform grayscale hover:grayscale-0">🗑️</button>
-                  </div>
                 </td>
               </tr>
             ))}
