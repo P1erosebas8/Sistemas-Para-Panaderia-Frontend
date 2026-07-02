@@ -118,6 +118,33 @@ export default function AdminInventory() {
     return matchesSearch && matchesCat && matchesStatus;
   });
 
+  const exportToCSV = () => {
+    if(filteredProducts.length === 0) return alert("No hay datos para exportar");
+    const headers = ["ID", "Nombre", "Categoria", "Precio", "Stock", "Estado", "Descripcion"];
+    const csvContent = [
+      headers.join(','),
+      ...filteredProducts.map(p => [
+        `"${p.id}"`,
+        `"${String(p.name).replace(/"/g, '""')}"`,
+        `"${String(p.category).replace(/"/g, '""')}"`,
+        `"${p.price}"`,
+        `"${p.stock}"`,
+        `"${p.originalProduct?.status === 'INACTIVO' ? 'Inactivo' : 'Disponible'}"`,
+        `"${String(p.description || '').replace(/"/g, '""')}"`
+      ].join(','))
+    ].join('\n');
+    
+    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+    const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `inventario_briselli.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64 animate-fadeIn">
@@ -134,12 +161,20 @@ export default function AdminInventory() {
           <h2 className="text-3xl font-black text-artisan-primary tracking-tighter">Inventario Maestro</h2>
           <p className="text-artisan-tertiary text-sm font-medium">Briselli: Gestión de Pasteles, Panes y Postres</p>
         </div>
-        <button
-          onClick={() => { setCurrentEditing(null); setIsModalOpen(true); }}
-          className="bg-artisan-secondary text-white px-8 py-3 rounded-xl font-black shadow-lg hover:bg-artisan-primary hover:-translate-y-1 transition-all"
-        >
-          + AGREGAR PRODUCTO
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={exportToCSV}
+            className="bg-green-600 text-white px-6 py-3 rounded-xl font-black shadow-lg hover:bg-green-700 hover:-translate-y-1 transition-all"
+          >
+            📥 EXCEL
+          </button>
+          <button
+            onClick={() => { setCurrentEditing(null); setIsModalOpen(true); }}
+            className="bg-artisan-secondary text-white px-8 py-3 rounded-xl font-black shadow-lg hover:bg-artisan-primary hover:-translate-y-1 transition-all"
+          >
+            + AGREGAR PRODUCTO
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
