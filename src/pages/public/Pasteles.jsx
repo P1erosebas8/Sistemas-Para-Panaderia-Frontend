@@ -256,15 +256,15 @@ export default function Pasteles() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
               </svg>
-              <button className="cursor-pointer px-8 py-3.5 bg-white text-[#6f4014] rounded-xl font-black uppercase tracking-[0.15em] text-xs sm:text-sm shadow-lg transition-all duration-300 hover:scale-105 active:scale-95">
-                Reservar Ahora
+              <button disabled className="cursor-not-allowed px-8 py-3.5 bg-white/20 text-[#ffdab8] rounded-xl font-black uppercase tracking-[0.15em] text-xs sm:text-sm border border-[#ffdab8]/30">
+                Próximamente
               </button>
             </div>
           </div>
           
           <div className="flex-1 order-1 md:order-2 w-full z-10">
             <div className="rounded-2xl overflow-hidden shadow-2xl rotate-2 transition-transform duration-700 ease-out group-hover:rotate-0 group-hover:scale-[1.02]">
-              <img alt="Torta de Lúcuma y Maracuyá" className="w-full aspect-4/3 object-cover" src="https://brigams.pe/wp-content/uploads/FRONTAL-CON-PEDESTAL-4-scaled-e1627313204442.jpg" />
+              <img alt="Torta de Lúcuma y Maracuyá" className="w-full aspect-4/3 object-cover" src="https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=80&w=800" />
             </div>
           </div>
         </section>
