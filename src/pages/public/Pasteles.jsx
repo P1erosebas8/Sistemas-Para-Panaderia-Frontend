@@ -3,16 +3,16 @@ import { productService } from "../../services/productService";
 import { addProductToCartFlow } from "../../utils/cartFlow";
 
 const etiquetaColor = {
-  "Más Vendido":     { bg: "#ffdcbd", text: "#6b3800" },
-  "Nuevo":           { bg: "#d1f0d9", text: "#165128" },
-  "Artesanal":       { bg: "#e8d5f5", text: "#5a2d82" },
-  "Tropical":        { bg: "#fff3cd", text: "#7a5500" },
-  "Favorita":        { bg: "#fce4ec", text: "#7b003a" },
-  "Sabor Peruano":   { bg: "#fff8e1", text: "#c84b00" },
-  "Celebración":     { bg: "#ddeeff", text: "#0a3d7a" },
-  "Edición Limitada":{ bg: "#ede7f6", text: "#3e1a7a" },
-  "Temporada":       { bg: "#e8f5e9", text: "#1a5c26" },
-  "Últimos":         { bg: "#ffebee", text: "#b71c1c" }
+  "Más Vendido": { bg: "#ffdcbd", text: "#6b3800" },
+  "Nuevo": { bg: "#d1f0d9", text: "#165128" },
+  "Artesanal": { bg: "#e8d5f5", text: "#5a2d82" },
+  "Tropical": { bg: "#fff3cd", text: "#7a5500" },
+  "Favorita": { bg: "#fce4ec", text: "#7b003a" },
+  "Sabor Peruano": { bg: "#fff8e1", text: "#c84b00" },
+  "Celebración": { bg: "#ddeeff", text: "#0a3d7a" },
+  "Edición Limitada": { bg: "#ede7f6", text: "#3e1a7a" },
+  "Temporada": { bg: "#e8f5e9", text: "#1a5c26" },
+  "Últimos": { bg: "#ffebee", text: "#b71c1c" }
 };
 
 export default function Pasteles() {
@@ -49,13 +49,13 @@ export default function Pasteles() {
     fetchProductos();
   }, []);
 
-  
+
   const showAddToast = () => {
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 1800);
   };
 
-  const filtrados = pasteles.filter(p => 
+  const filtrados = pasteles.filter(p =>
     categoriaActiva === "Todas" || p.categoria === categoriaActiva
   );
 
@@ -77,7 +77,7 @@ export default function Pasteles() {
   return (
     <div className="min-h-screen bg-[#fbf9f5] text-[#1b1c1a] font-sans selection:bg-[#ffdcc5] selection:text-[#663100]">
       <main className="pt-24 pb-24 px-6 sm:px-8 max-w-7xl mx-auto">
-        
+
         {/* ── Hero Header Section ── */}
         <header className="mb-16 sm:mb-20 flex flex-col md:flex-row gap-8 sm:gap-12 items-end">
           <div className="flex-1">
@@ -90,7 +90,7 @@ export default function Pasteles() {
             </h1>
           </div>
           <div className="max-w-xs text-[#51443b] text-base sm:text-lg leading-relaxed mb-2 sm:mb-4 italic">
-             Nuestro horneado diario es un tributo a las artes antiguas. {pasteles.length} creaciones disponibles hoy — sin atajos, sin aditivos artificiales.
+            Nuestro horneado diario es un tributo a las artes antiguas. {pasteles.length} creaciones disponibles hoy — sin atajos, sin aditivos artificiales.
           </div>
         </header>
 
@@ -100,11 +100,10 @@ export default function Pasteles() {
             <button
               key={cat}
               onClick={() => setCategoriaActiva(cat)}
-              className={`cursor-pointer whitespace-nowrap px-6 sm:px-8 py-3 rounded-full font-bold text-xs sm:text-sm uppercase tracking-widest transition-all duration-300 active:scale-95 ${
-                categoriaActiva === cat
+              className={`cursor-pointer whitespace-nowrap px-6 sm:px-8 py-3 rounded-full font-bold text-xs sm:text-sm uppercase tracking-widest transition-all duration-300 active:scale-95 ${categoriaActiva === cat
                   ? "bg-[#6f4014] text-white shadow-[0_8px_24px_rgba(111,64,20,0.2)]"
                   : "bg-[#f5f3ef] text-[#6f4014] hover:bg-[#eae8e4]"
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -114,25 +113,25 @@ export default function Pasteles() {
         {/* ── Bento Grid (Solo visible en "Todas") ── */}
         {mostrarBento && itemsBento.length >= 4 && (
           <section className="grid grid-cols-1 sm:grid-cols-12 gap-6 sm:gap-8 items-stretch mb-24">
-            
+
             {/* Destacado 1: Vertical Grande */}
             <div className="sm:col-span-12 md:col-span-5 flex flex-col h-full">
               <div className="bg-[#f5f3ef] rounded-2xl overflow-hidden shadow-sm flex flex-col h-full">
                 <div className="aspect-4/5 overflow-hidden relative">
                   <div className="absolute inset-0 bg-black/5 z-10 pointer-events-none" />
-                  <img 
-                    alt={itemsBento[0].nombre} 
-                    className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-105" 
-                    src={itemsBento[0].img} 
+                  <img
+                    alt={itemsBento[0].nombre}
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out hover:scale-105"
+                    src={itemsBento[0].img}
                   />
                 </div>
                 <div className="p-6 sm:p-8 flex-1 flex flex-col bg-[#f5f3ef] z-20">
                   <div className="flex justify-between items-start mb-4 gap-4">
                     <div>
                       {itemsBento[0].etiqueta && (
-                         <span className="px-3 py-1.5 bg-[#ffdcbd] text-[#623f18] rounded-full text-[10px] font-black uppercase tracking-[0.15em] mb-3 inline-block">
-                           {itemsBento[0].etiqueta}
-                         </span>
+                        <span className="px-3 py-1.5 bg-[#ffdcbd] text-[#623f18] rounded-full text-[10px] font-black uppercase tracking-[0.15em] mb-3 inline-block">
+                          {itemsBento[0].etiqueta}
+                        </span>
                       )}
                       <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#6f4014] leading-tight">
                         {itemsBento[0].nombre}
@@ -145,7 +144,7 @@ export default function Pasteles() {
                   <p className="text-[#51443b] text-base leading-relaxed line-clamp-3 flex-1 mb-4">
                     {itemsBento[0].descripcion}
                   </p>
-                  
+
                   {/* Botones de acción Bento Vertical */}
                   <GrupoBotones pastel={itemsBento[0]} onAbrirModal={setPastelSeleccionado} />
                 </div>
@@ -154,7 +153,7 @@ export default function Pasteles() {
 
             {/* Columna Derecha (Destacados 2, 3 y 4) */}
             <div className="sm:col-span-12 md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
-              
+
               {/* Destacado 2 */}
               <div className="bg-[#f5f3ef] rounded-2xl overflow-hidden shadow-sm flex flex-col h-full">
                 <div className="aspect-square overflow-hidden relative">
@@ -229,29 +228,29 @@ export default function Pasteles() {
         {/* ── Grid Dinámico (Catálogo general) ── */}
         {categoriaActiva === "Todas"
           ? gruposPorCategoria.map(cat => {
-              const grupo = itemsRestantes.filter(p => p.categoria === cat);
-              if (grupo.length === 0) return null;
-              return <Seccion key={cat} titulo={cat} items={grupo} onAbrirModal={setPastelSeleccionado} onAddSuccess={showAddToast} />;
-            })
+            const grupo = itemsRestantes.filter(p => p.categoria === cat);
+            if (grupo.length === 0) return null;
+            return <Seccion key={cat} titulo={cat} items={grupo} onAbrirModal={setPastelSeleccionado} onAddSuccess={showAddToast} />;
+          })
           : <Seccion titulo={categoriaActiva} items={filtrados} onAbrirModal={setPastelSeleccionado} onAddSuccess={showAddToast} />
         }
 
         {/* ── Seasonal Highlight Section ── */}
         <section className="mt-24 sm:mt-32 p-8 sm:p-12 md:p-16 bg-[#835b31] rounded-3xl flex flex-col md:flex-row gap-12 sm:gap-16 items-center text-[#ffdab8] relative overflow-hidden group">
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-white via-transparent to-transparent pointer-events-none" />
-          
+
           <div className="flex-1 order-2 md:order-1 z-10">
             <span className="text-[10px] uppercase tracking-[0.22em] font-bold opacity-60 block mb-4">Edición Limitada · Solo hasta agotar stock</span>
             <h2 className="text-4xl sm:text-5xl font-black mb-6 leading-[1.05] tracking-tight">
-              Torta de Lúcuma<br className="hidden sm:block"/> y Maracuyá
+              Torta de Frutos<br className="hidden sm:block" /> Rojos Premium
             </h2>
             <p className="text-base sm:text-lg mb-10 opacity-90 max-w-md leading-relaxed font-medium">
-              Nuestra creación estrella de temporada: mousse de lúcuma de Huamachuco sobre base crujiente de praliné, con insert de maracuyá fresco y cobertura dorada. Un homenaje a los sabores del Perú.
+              Nuestra creación estrella de temporada: Elegancia hecha postre. Imponente torta de dos pisos cubierta con una sedosa y delicada capa de crema blanca, decorada artísticamente con una cascada de fresas frescas, arándanos silvestres y frambuesas maduras con un sutil toque de azúcar soplada. Ideal para celebraciones inolvidables.
             </p>
             <div className="flex flex-wrap items-center gap-6">
               <span className="text-3xl sm:text-4xl font-light tracking-tight">S/ 138</span>
-              <svg 
-                className="w-8 h-8 opacity-70 group-hover:translate-x-2 transition-transform duration-300" 
+              <svg
+                className="w-8 h-8 opacity-70 group-hover:translate-x-2 transition-transform duration-300"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
@@ -261,7 +260,7 @@ export default function Pasteles() {
               </button>
             </div>
           </div>
-          
+
           <div className="flex-1 order-1 md:order-2 w-full z-10">
             <div className="rounded-2xl overflow-hidden shadow-2xl rotate-2 transition-transform duration-700 ease-out group-hover:rotate-0 group-hover:scale-[1.02]">
               <img alt="Torta de Lúcuma y Maracuyá" className="w-full aspect-4/3 object-cover" src="https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&q=80&w=800" />
@@ -315,7 +314,7 @@ function TarjetaPastel({ pastel, onAbrirModal, onAddSuccess }) {
           {pastel.porciones}
         </div>
       </div>
-      
+
       <div className="p-5 flex-1 flex flex-col bg-[#f5f3ef] z-20">
         <div>
           <div className="flex justify-between items-start mb-2 gap-2">
@@ -333,7 +332,7 @@ function TarjetaPastel({ pastel, onAbrirModal, onAddSuccess }) {
             {pastel.descripcion}
           </p>
         </div>
-        
+
         <GrupoBotones pastel={pastel} onAbrirModal={onAbrirModal} onAddSuccess={onAddSuccess} />
       </div>
     </div>
@@ -343,7 +342,7 @@ function TarjetaPastel({ pastel, onAbrirModal, onAddSuccess }) {
 // ── COMPONENTE DE BOTONES PARA CARDS ──
 function GrupoBotones({ pastel, onAbrirModal, onAddSuccess, bgOscuro = false }) {
   const [agregado, setAgregado] = useState(false);
-  
+
   const handleAgregar = () => {
     const result = addProductToCartFlow(pastel);
     if (!result.ok) {
@@ -355,16 +354,16 @@ function GrupoBotones({ pastel, onAbrirModal, onAddSuccess, bgOscuro = false }) 
     setTimeout(() => setAgregado(false), 1500);
   };
 
-  const btnAñadirColor = agregado 
-    ? "bg-[#165128] text-white border-[#165128]" 
-    : bgOscuro 
+  const btnAñadirColor = agregado
+    ? "bg-[#165128] text-white border-[#165128]"
+    : bgOscuro
       ? "bg-[#6f4014] text-white hover:bg-[#5a3310] border-[#6f4014]"
       : "bg-[#6f4014] text-white hover:bg-[#5a3310] border-[#6f4014]";
 
   return (
     <div className="flex gap-2 w-full mt-auto pt-2">
       {/* Botón Ver Detalles (Delineado) */}
-      <button 
+      <button
         onClick={() => onAbrirModal(pastel)}
         className="cursor-pointer flex-1 py-2.5 px-2 text-[10px] font-black uppercase tracking-[0.1em] text-center border border-[#6f4014] text-[#6f4014] rounded-xl hover:bg-[#6f4014] hover:text-white transition-all active:scale-[0.98]"
       >
@@ -372,7 +371,7 @@ function GrupoBotones({ pastel, onAbrirModal, onAddSuccess, bgOscuro = false }) 
       </button>
 
       {/* Botón Añadir Rápido (Relleno) */}
-      <button 
+      <button
         onClick={handleAgregar}
         className={`cursor-pointer flex-1 py-2.5 px-2 text-[10px] font-black uppercase tracking-[0.1em] border rounded-xl transition-all duration-300 active:scale-[0.98] flex justify-center items-center ${btnAñadirColor}`}
       >
@@ -405,20 +404,20 @@ function ModalPastel({ pastel, onClose, onAddSuccess }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1b1c1a]/70 backdrop-blur-sm">
       {/* Contenedor Modal: Controlado a un 75vh máximo en desktop para que NUNCA pida scroll, y h-auto en celulares */}
       <div className="bg-[#fbf9f5] rounded-3xl w-full max-w-4xl max-h-[90vh] md:h-[75vh] flex flex-col md:flex-row overflow-hidden shadow-2xl relative">
-        
+
         {/* Botón Cerrar */}
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-4 right-4 z-50 bg-white/90 w-9 h-9 flex items-center justify-center rounded-full text-[#6f4014] font-bold shadow-md hover:bg-[#e5ded6] hover:scale-105 active:scale-95 transition-all"
         >
           ✕
         </button>
-        
+
         {/* Lado Imagen: Oculta la parte sobrante en celulares (h-48), Mitad de pantalla en Desktop (h-full) */}
         <div className="w-full h-48 md:h-full md:w-1/2 relative bg-[#f5f3ef] shrink-0">
           <img src={pastel.img} alt={pastel.nombre} className="w-full h-full object-cover" />
           {pastel.etiqueta && colores && (
-            <div 
+            <div
               className="absolute top-4 left-4 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-md"
               style={{ backgroundColor: colores.bg, color: colores.text }}
             >
@@ -440,7 +439,7 @@ function ModalPastel({ pastel, onClose, onAddSuccess }) {
               S/ {pastel.precio}
             </div>
           </div>
-          
+
           <div className="flex-1 flex flex-col justify-center">
             <p className="text-[#51443b] text-sm md:text-base leading-relaxed mb-6 italic">
               "{pastel.descripcion}"
@@ -460,13 +459,12 @@ function ModalPastel({ pastel, onClose, onAddSuccess }) {
           </div>
 
           <div className="mt-auto pt-2">
-            <button 
+            <button
               onClick={handleAgregarModal}
-              className={`cursor-pointer w-full py-4 rounded-xl font-black uppercase tracking-[0.15em] text-[12px] transition-all duration-300 active:scale-[0.98] ${
-                agregado 
-                  ? "bg-[#165128] text-white shadow-none" 
+              className={`cursor-pointer w-full py-4 rounded-xl font-black uppercase tracking-[0.15em] text-[12px] transition-all duration-300 active:scale-[0.98] ${agregado
+                  ? "bg-[#165128] text-white shadow-none"
                   : "bg-[#6f4014] text-white shadow-[0_8px_24px_rgba(111,64,20,0.25)] hover:bg-[#5a3310]"
-              }`}
+                }`}
             >
               {agregado ? "✓ Añadido al carrito" : "Añadir al carrito"}
             </button>
