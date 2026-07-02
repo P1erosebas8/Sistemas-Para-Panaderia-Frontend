@@ -253,8 +253,8 @@ export default function Postres() {
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
               </svg>
-              <button className="cursor-pointer px-8 py-3.5 bg-white text-[#6f4014] rounded-xl font-black uppercase tracking-[0.15em] text-xs sm:text-sm shadow-lg transition-all duration-300 hover:scale-105 active:scale-95">
-                Reservar Ahora
+              <button disabled className="cursor-not-allowed px-8 py-3.5 bg-white/20 text-[#ffdab8] rounded-xl font-black uppercase tracking-[0.15em] text-xs sm:text-sm border border-[#ffdab8]/30">
+                Próximamente
               </button>
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function Postres() {
               <img
                 alt="Copa de Lúcuma y Maracuyá"
                 className="w-full aspect-4/3 object-cover"
-                src="https://scontent-lim1-1.xx.fbcdn.net/v/t39.30808-6/492756468_1254704973322313_5267312312456129657_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7b2446&_nc_ohc=Pao4VrQOPCYQ7kNvwEqqGd3&_nc_oc=Adon_MobBW7RHiIKIwylmqWEf6FG-QcwvtW3ksIBxyEZQRC7RRDtaGTQPiCrjNOk8LE&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=IZ1lXnN4Fiv_GL7AseJ9Ww&_nc_ss=7b2a8&oh=00_Af0lqrosY1vJljMjofSevK7YOW8KQytWVLIJ5RWQoCMntw&oe=69F83DCC"
+                src="https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=80&w=800"
               />
             </div>
           </div>
