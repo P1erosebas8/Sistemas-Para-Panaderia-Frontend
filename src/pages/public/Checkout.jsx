@@ -80,7 +80,7 @@ export default function Checkout() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer pk_test_1lkJqN3Keqh5EBqV'
+          'Authorization': `Bearer ${import.meta.env.VITE_CULQI_PUBLIC_KEY}`
         },
         body: JSON.stringify({
           card_number: paymentData.cardNumber.replace(/\s/g, ''),
@@ -99,7 +99,7 @@ export default function Checkout() {
 
       // 3. Send Charge to Backend
       const token = localStorage.getItem('briselli_token');
-      const backendBaseUrl = import.meta.env.VITE_API_URL || 'https://sistemas-para-panaderia-backend.onrender.com/api';
+      const backendBaseUrl = import.meta.env.VITE_API_URL;
       
       const chargeResponse = await fetch(`${backendBaseUrl}/payments/charge`, {
         method: 'POST',
