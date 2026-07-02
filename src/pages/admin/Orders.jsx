@@ -70,6 +70,32 @@ export default function AdminOrders() {
       .filter(Boolean);
   };
 
+  const exportToCSV = () => {
+    if(filteredOrders.length === 0) return alert("No hay datos para exportar");
+    const headers = ["ID Pedido", "Cliente", "Fecha", "Productos", "Total", "Estado"];
+    const csvContent = [
+      headers.join(','),
+      ...filteredOrders.map(o => [
+        `"${o.id}"`,
+        `"${String(o.customer).replace(/"/g, '""')}"`,
+        `"${formatOrderDateTime(o.date)}"`,
+        `"${String(o.items).replace(/"/g, '""')}"`,
+        `"${o.total}"`,
+        `"${o.status}"`
+      ].join(','))
+    ].join('\n');
+    
+    const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+    const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `pedidos_briselli.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const createVoucher = (order) => {
     const subtotal = Number(order.total || 0);
     const igv = subtotal * 0.18;
@@ -295,8 +321,16 @@ export default function AdminOrders() {
           <p className="text-artisan-tertiary text-sm font-medium">Control de ventas y entregas diarias</p>
         </div>
         
-        {/* Filtros de Estado */}
-        <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100">
+        <div className="flex gap-4 items-center">
+          <button
+            onClick={exportToCSV}
+            className="bg-green-600 text-white px-4 py-2 rounded-xl font-bold shadow-sm hover:bg-green-700 transition-all text-sm"
+          >
+            📥 Exportar Excel
+          </button>
+          
+          {/* Filtros de Estado */}
+          <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100">
           {['Todos', 'Pendiente', 'Entregado'].map((status) => (
             <button
               key={status}
