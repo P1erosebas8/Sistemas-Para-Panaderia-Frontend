@@ -264,7 +264,7 @@ export default function Pasteles() {
           
           <div className="flex-1 order-1 md:order-2 w-full z-10">
             <div className="rounded-2xl overflow-hidden shadow-2xl rotate-2 transition-transform duration-700 ease-out group-hover:rotate-0 group-hover:scale-[1.02]">
-              <img alt="Torta de Lúcuma y Maracuyá" className="w-full aspect-4/3 object-cover" src="https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=80&w=800" />
+              <img alt="Torta de Lúcuma y Maracuyá" className="w-full aspect-4/3 object-cover" src="https://images.unsplash.com/photo-1535141192574-5d4897c12636?auto=format&fit=crop&q=80&w=800" />
             </div>
           </div>
         </section>
