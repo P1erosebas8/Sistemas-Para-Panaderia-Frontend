@@ -46,8 +46,12 @@ const customAlert = (msg) => {
 
 window.alert = customAlert;
 
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "TU_GOOGLE_CLIENT_ID_AQUI.apps.googleusercontent.com"}>
+      <App />
+    </GoogleOAuthProvider>
   </React.StrictMode>
 );

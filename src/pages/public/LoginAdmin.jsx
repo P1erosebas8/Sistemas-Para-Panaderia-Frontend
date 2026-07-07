@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setAuthSession } from '../../utils/authSession';
 import { authService } from '../../services/authService';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -44,7 +45,7 @@ const Login = () => {
                 setAuthSession(res);
                 localStorage.setItem('briselli_token', res.token);
                 localStorage.setItem('briselli_active_user', JSON.stringify(res));
-                
+
                 alert(`¡Bienvenido ${res.firstName}!`);
                 if (res.role === 'ADMIN' || res.role === 'admin' || res.role === 'ROLE_ADMIN') {
                     navigate('/admin');
@@ -56,7 +57,7 @@ const Login = () => {
 
             if (isLogin) {
                 const res = await authService.login({ email, password });
-                
+
                 setAuthSession(res);
                 localStorage.setItem('briselli_token', res.token);
                 localStorage.setItem('briselli_active_user', JSON.stringify(res));
@@ -74,7 +75,7 @@ const Login = () => {
                     email,
                     password
                 });
-                
+
                 alert(res || "Registro exitoso. Revisa tu correo electrónico para obtener tu código OTP.");
                 setShowOtp(true);
             }
@@ -82,6 +83,29 @@ const Login = () => {
             console.error(error);
             const msg = error.response?.data?.message || error.response?.data || "Ocurrió un error. Verifica tus credenciales.";
             alert(typeof msg === 'string' ? msg : "Error en la autenticación");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSuccess = async (credentialResponse) => {
+        try {
+            setLoading(true);
+            const res = await authService.googleLogin(credentialResponse.credential);
+            setAuthSession(res);
+            localStorage.setItem('briselli_token', res.token);
+            localStorage.setItem('briselli_active_user', JSON.stringify(res));
+
+            alert(`¡Bienvenido ${res.firstName}!`);
+            if (res.role === 'ADMIN' || res.role === 'admin' || res.role === 'ROLE_ADMIN') {
+                navigate('/admin');
+            } else {
+                navigate('/postres');
+            }
+        } catch (error) {
+            console.error(error);
+            const msg = error.response?.data?.message || error.response?.data || "Ocurrió un error con Google.";
+            alert(typeof msg === 'string' ? msg : "Error en la autenticación con Google");
         } finally {
             setLoading(false);
         }
@@ -145,44 +169,44 @@ const Login = () => {
                         ) : (
                             <>
                                 {!isLogin && !isForgotPassword && (
-                            <div className="space-y-1.5">
-                                <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Nombre Completo</label>
-                                <input
-                                    required
-                                    type="text"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="w-full h-12 px-5 bg-gray-50 border-2 border-gray-100 focus:border-[#8d4b00] focus:bg-white rounded-2xl text-sm transition-all outline-none"
-                                    placeholder="Tu nombre"
-                                />
-                            </div>
-                        )}
+                                    <div className="space-y-1.5">
+                                        <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Nombre Completo</label>
+                                        <input
+                                            required
+                                            type="text"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
+                                            className="w-full h-12 px-5 bg-gray-50 border-2 border-gray-100 focus:border-[#8d4b00] focus:bg-white rounded-2xl text-sm transition-all outline-none"
+                                            placeholder="Tu nombre"
+                                        />
+                                    </div>
+                                )}
 
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Correo Electrónico</label>
-                            <input
-                                required
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full h-12 px-5 bg-gray-50 border-2 border-gray-100 focus:border-[#8d4b00] focus:bg-white rounded-2xl text-sm transition-all outline-none"
-                                placeholder="ejemplo@correo.com"
-                            />
-                        </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Correo Electrónico</label>
+                                    <input
+                                        required
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        className="w-full h-12 px-5 bg-gray-50 border-2 border-gray-100 focus:border-[#8d4b00] focus:bg-white rounded-2xl text-sm transition-all outline-none"
+                                        placeholder="ejemplo@correo.com"
+                                    />
+                                </div>
 
-                        {!isForgotPassword && (
-                        <div className="space-y-1.5">
-                            <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Contraseña</label>
-                            <input
-                                required
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full h-12 px-5 bg-gray-50 border-2 border-gray-100 focus:border-[#8d4b00] focus:bg-white rounded-2xl text-sm transition-all outline-none"
-                                placeholder="••••••••"
-                            />
-                        </div>
-                        )}
+                                {!isForgotPassword && (
+                                    <div className="space-y-1.5">
+                                        <label className="text-[11px] font-black text-[#8d4b00] uppercase tracking-wider ml-1">Contraseña</label>
+                                        <input
+                                            required
+                                            type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            className="w-full h-12 px-5 bg-gray-50 border-2 border-gray-100 focus:border-[#8d4b00] focus:bg-white rounded-2xl text-sm transition-all outline-none"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+                                )}
 
                             </>
                         )}
@@ -197,34 +221,55 @@ const Login = () => {
                     </form>
 
                     {!showOtp && (
-                        <div className="w-full mt-6 space-y-3">
-                            {isForgotPassword ? (
-                                <button
-                                    onClick={() => { setIsForgotPassword(false); setIsLogin(true); }}
-                                    className="w-full text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter"
-                                >
-                                    Volver al inicio de sesión
-                                </button>
-                            ) : (
-                                <>
-                                    {isLogin && (
+                        <div className="w-full mt-6">
+                            <div className="w-full flex items-center justify-center mb-6">
+                                <div className="h-px bg-gray-200 flex-1"></div>
+                                <span className="px-4 text-xs text-gray-400 font-bold uppercase tracking-widest">O</span>
+                                <div className="h-px bg-gray-200 flex-1"></div>
+                            </div>
+
+                            <div className="w-full flex justify-center mb-6">
+                                <GoogleLogin
+                                    onSuccess={handleGoogleSuccess}
+                                    onError={() => {
+                                        console.log('Login Failed');
+                                        alert("El inicio de sesión con Google falló");
+                                    }}
+                                    theme="filled_blue"
+                                    shape="pill"
+                                    text={isLogin ? "signin_with" : "signup_with"}
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                {isForgotPassword ? (
+                                    <button
+                                        onClick={() => { setIsForgotPassword(false); setIsLogin(true); }}
+                                        className="w-full text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter"
+                                    >
+                                        Volver al inicio de sesión
+                                    </button>
+                                ) : (
+                                    <>
+                                        {isLogin && (
+                                            <button
+                                                type="button"
+                                                onClick={() => { setIsForgotPassword(true); setIsLogin(false); }}
+                                                className="w-full text-[11px] font-bold text-gray-500 hover:text-gray-800 transition-colors tracking-tight block text-center"
+                                            >
+                                                ¿Olvidaste tu contraseña?
+                                            </button>
+                                        )}
                                         <button
                                             type="button"
-                                            onClick={() => { setIsForgotPassword(true); setIsLogin(false); }}
-                                            className="w-full text-[11px] font-bold text-gray-500 hover:text-gray-800 transition-colors tracking-tight block text-center"
+                                            onClick={() => setIsLogin(!isLogin)}
+                                            className="w-full text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter block text-center"
                                         >
-                                            ¿Olvidaste tu contraseña?
+                                            {isLogin ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión'}
                                         </button>
-                                    )}
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsLogin(!isLogin)}
-                                        className="w-full text-[11px] font-black text-[#8d4b00] hover:text-[#b15f00] transition-colors uppercase underline tracking-tighter block text-center"
-                                    >
-                                        {isLogin ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión'}
-                                    </button>
-                                </>
-                            )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
