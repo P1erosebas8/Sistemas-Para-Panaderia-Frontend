@@ -227,12 +227,11 @@ export default function Checkout() {
               </div>
               <div>
                 <label className="block text-sm font-bold text-[#6f4014] mb-2">Dirección de Entrega</label>
-                <input 
-                  type="text" 
+                <textarea 
                   value={shippingInfo.address}
                   onChange={e => setShippingInfo({...shippingInfo, address: e.target.value})}
                   placeholder="Ej: Av. Los Rosales 123, Surco" 
-                  className="w-full border border-orange-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8d4b00] focus:ring-1 focus:ring-[#8d4b00] transition-colors" 
+                  className="w-full border border-orange-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8d4b00] focus:ring-1 focus:ring-[#8d4b00] transition-colors resize-none h-20" 
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -249,12 +248,11 @@ export default function Checkout() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-[#6f4014] mb-2">Notas Especiales</label>
-                  <input 
-                    type="text" 
+                  <textarea 
                     value={shippingInfo.notes}
                     onChange={e => setShippingInfo({...shippingInfo, notes: e.target.value})}
                     placeholder="Ej: Tocar timbre 2 veces" 
-                    className="w-full border border-orange-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8d4b00]" 
+                    className="w-full border border-orange-200 rounded-xl px-4 py-3 focus:outline-none focus:border-[#8d4b00] resize-none h-24" 
                   />
                 </div>
               </div>
