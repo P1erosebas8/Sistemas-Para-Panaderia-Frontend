@@ -18,8 +18,8 @@ const customAlert = (msg) => {
   toast.style.fontWeight = 'bold';
   toast.style.fontSize = '14px';
   toast.style.fontFamily = '"Inter", sans-serif';
-  
-  if(!document.getElementById('briselli-toast-styles')) {
+
+  if (!document.getElementById('briselli-toast-styles')) {
     const style = document.createElement('style');
     style.id = 'briselli-toast-styles';
     style.innerHTML = `
@@ -34,10 +34,10 @@ const customAlert = (msg) => {
     `;
     document.head.appendChild(style);
   }
-  
+
   toast.style.animation = 'slideInLeftToast 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
   document.body.appendChild(toast);
-  
+
   setTimeout(() => {
     toast.style.animation = 'fadeOutLeftToast 0.4s ease-out forwards';
     setTimeout(() => toast.remove(), 400);
@@ -50,7 +50,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || "TU_GOOGLE_CLIENT_ID_AQUI.apps.googleusercontent.com"}>
+    <GoogleOAuthProvider clientId={import.meta.env.GOOGLE_FRONTEND_CLIENT_ID}>
       <App />
     </GoogleOAuthProvider>
   </React.StrictMode>
